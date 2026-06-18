@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard academico del portal universitario PSM.">
+    <title>Dashboard | Universidad PSM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="../estilos/dashboard.css">
+    <script src="../Js/dashboard.js" defer></script>
+</head>
+<body class="dashboard-loading">
+    <div id="dashboard-loader" class="dashboard-loader" role="status" aria-live="polite">
+        <div class="loader-card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV9LbEAGp9j_T1kVfdlxqC_nBdX74pdTPnZAHp3llB1PQPpkl-ZBNNjds0&s=10" alt="Logo Universidad PSM">
+            <strong>Preparando tu portal academico</strong>
+            <span>Validando sesion y cargando tus datos</span>
+            <div class="loader-bar" aria-hidden="true"><span></span></div>
+        </div>
+    </div>
+
+    <div class="app-shell">
+        <aside id="sidebar" class="sidebar" aria-label="Menu principal">
+            <div class="sidebar-brand">
+                <img id="dashboard-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV9LbEAGp9j_T1kVfdlxqC_nBdX74pdTPnZAHp3llB1PQPpkl-ZBNNjds0&s=10" alt="Logo Universidad PSM">
+                <div>
+                    <strong>PSM</strong>
+                    <span>Portal Academico</span>
+                </div>
+            </div>
+
+            <section class="student-card" aria-label="Datos del estudiante">
+                <div class="student-avatar" id="student-avatar">LR</div>
+                <div>
+                    <h2 id="student-name">Estudiante PSM</h2>
+                    <p id="student-career">Ingenieria de Sistemas</p>
+                </div>
+            </section>
+
+            <nav class="sidebar-nav" aria-label="Secciones del dashboard">
+                <a class="nav-link active" href="#overview"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Inicio</span></a>
+                <a class="nav-link" href="#schedule"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Horario</span></a>
+                <a class="nav-link" href="#grades"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Notas</span></a>
+                <a class="nav-link" href="#messages"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
+                <a class="nav-link" href="#notifications"><i class="fa-solid fa-bell" aria-hidden="true"></i><span>Notificaciones</span></a>
+                <a class="nav-link" href="#news"><i class="fa-solid fa-newspaper" aria-hidden="true"></i><span>Noticias</span></a>
+            </nav>
+
+            <button id="logout-button" class="logout-button" type="button">
+                <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                <span>Cerrar sesion</span>
+            </button>
+        </aside>
+
+        <div id="sidebar-overlay" class="sidebar-overlay" hidden></div>
+
+        <main class="dashboard-main">
+            <header class="topbar">
+                <button id="menu-button" class="menu-button" type="button" aria-label="Abrir menu">
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                </button>
+
+                <div class="topbar-title">
+                    <p>Panel academico</p>
+                    <h1>Bienvenido, <span id="welcome-name">estudiante</span></h1>
+                </div>
+
+                <form class="search-box" role="search">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input type="search" placeholder="Buscar materias, noticias o mensajes" aria-label="Buscar en el portal">
+                </form>
+
+                <div class="topbar-actions" aria-label="Acciones de usuario">
+                    <a class="topbar-action notification-button" href="#notifications" aria-label="Ver notificaciones" title="Notificaciones">
+                        <i class="fa-solid fa-bell" aria-hidden="true"></i>
+                        <span id="notification-count">3</span>
+                    </a>
+                    <button id="settings-button" class="topbar-action" type="button" aria-label="Abrir configuracion" title="Configuracion">
+                        <i class="fa-solid fa-gear" aria-hidden="true"></i>
+                    </button>
+                    <button id="profile-button" class="topbar-action profile-action" type="button" aria-label="Ver mi perfil" title="Mi Perfil">
+                        <i class="fa-solid fa-user" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </header>
+
+            <section id="overview" class="hero-panel" aria-label="Resumen academico">
+                <div>
+                    <span class="status-pill">Periodo 2026-1 activo</span>
+                    <h2>Tu actividad academica esta al dia</h2>
+                    <p>Consulta clases, notas, mensajes institucionales y avisos importantes desde un solo lugar.</p>
+                </div>
+                <div class="hero-next-class">
+                    <span>Proxima clase</span>
+                    <strong id="next-class-title">Cargando...</strong>
+                    <p id="next-class-detail">Horario academico</p>
+                </div>
+            </section>
+
+            <section class="stats-grid" aria-label="Indicadores academicos" id="stats-grid"></section>
+
+            <section class="content-grid">
+                <article id="schedule" class="panel">
+                    <div class="section-heading">
+                        <div>
+                            <p>Semana actual</p>
+                            <h2>Horario academico</h2>
+                        </div>
+                        <button class="ghost-button" type="button"><i class="fa-solid fa-download" aria-hidden="true"></i><span>Exportar</span></button>
+                    </div>
+                    <div id="schedule-grid" class="schedule-grid"></div>
+                </article>
+
+                <article id="notifications" class="panel">
+                    <div class="section-heading compact">
+                        <div>
+                            <p>Centro de avisos</p>
+                            <h2>Notificaciones</h2>
+                        </div>
+                    </div>
+                    <div id="notifications-list" class="stack-list"></div>
+                </article>
+
+                <article id="grades" class="panel">
+                    <div class="section-heading">
+                        <div>
+                            <p>Rendimiento</p>
+                            <h2>Notas recientes</h2>
+                        </div>
+                    </div>
+                    <div id="grades-list" class="grades-list"></div>
+                </article>
+
+                <article id="messages" class="panel">
+                    <div class="section-heading compact">
+                        <div>
+                            <p>Bandeja institucional</p>
+                            <h2>Mensajes</h2>
+                        </div>
+                    </div>
+                    <div id="messages-list" class="stack-list"></div>
+                </article>
+
+                <article id="pensum" class="panel">
+                    <div class="section-heading compact">
+                        <div>
+                            <p>Academico</p>
+                            <h2>Pensum</h2>
+                        </div>
+                    </div>
+                    <div id="pensum-list" class="pensum-list"></div>
+                </article>
+
+                <article id="news" class="panel">
+                    <div class="section-heading">
+                        <div>
+                            <p>Comunidad PSM</p>
+                            <h2>Noticias</h2>
+                        </div>
+                    </div>
+                    <div id="news-list" class="news-grid"></div>
+                </article>
+            </section>
+        </main>
+
+        <section id="profile-modal" class="profile-modal" aria-hidden="true" hidden>
+            <div class="profile-modal-backdrop" data-profile-close></div>
+            <article class="profile-card" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+                <button id="profile-close-button" class="profile-close-button" type="button" aria-label="Cerrar perfil" data-profile-close>
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+
+                <aside class="profile-id-side" aria-label="Identidad institucional">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV9LbEAGp9j_T1kVfdlxqC_nBdX74pdTPnZAHp3llB1PQPpkl-ZBNNjds0&s=10" alt="Logo Santiago Mariño">
+                    <span>Instituto Universitario Politecnico</span>
+                    <strong>Santiago Mariño</strong>
+                    <small>Ficha Academica Digital</small>
+                </aside>
+
+                <div class="profile-content">
+                    <div class="profile-heading">
+                        <div>
+                            <p>Mi perfil</p>
+                            <h2 id="profile-modal-title">Ficha del estudiante</h2>
+                        </div>
+                        <span class="profile-status"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Activo</span>
+                    </div>
+
+                    <form id="profile-form" class="profile-form">
+                        <div class="profile-photo-panel">
+                            <div id="profile-avatar-preview" class="profile-avatar-preview" aria-label="Foto de perfil actual"></div>
+                            <div>
+                                <strong>Cambia tu foto de perfil</strong>
+                                <p>Sube una imagen para que tu ficha academica se vea brutal.</p>
+                                <label class="profile-upload-button" for="profile-photo-input">
+                                    <i class="fa-solid fa-camera" aria-hidden="true"></i>
+                                    <span>Seleccionar foto</span>
+                                </label>
+                                <input id="profile-photo-input" type="file" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="profile-fields-grid">
+                            <label class="profile-field" for="profile-birthdate">
+                                <span>Fecha de Nacimiento</span>
+                                <input id="profile-birthdate" type="date" name="birthdate">
+                            </label>
+
+                            <label class="profile-field" for="profile-document">
+                                <span>Cedula de Identidad</span>
+                                <input id="profile-document" type="text" name="document" inputmode="text" placeholder="V-00000000" maxlength="12">
+                            </label>
+
+                            <label class="profile-field profile-field-wide" for="profile-career">
+                                <span>Carrera que esta cursando</span>
+                                <input id="profile-career" type="text" name="career" placeholder="Ingenieria de Sistemas">
+                            </label>
+                        </div>
+
+                        <div class="profile-actions-row">
+                            <button id="profile-cancel-button" class="profile-secondary-button" type="button" data-profile-close>Cancelar</button>
+                            <button id="profile-save-button" class="profile-save-button" type="submit">
+                                <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                                <span>Guardar ficha</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+        </section>
+        
+        <!-- Lightbox para ver flyers de noticias -->
+        <div id="news-lightbox" class="news-lightbox" hidden aria-hidden="true">
+            <div class="news-lightbox-backdrop" data-lightbox-close></div>
+            <article class="news-lightbox-card" role="dialog" aria-modal="true">
+                <button id="news-lightbox-close" class="news-lightbox-close" aria-label="Cerrar">&times;</button>
+                <button id="news-lightbox-prev" class="news-lightbox-nav" aria-label="Anterior">&#8249;</button>
+                <button id="news-lightbox-next" class="news-lightbox-nav" aria-label="Siguiente">&#8250;</button>
+                <img id="news-lightbox-img" alt="Flyer noticia" src="">
+                <div class="news-lightbox-info">
+                    <div class="news-lightbox-meta">
+                        <h3 id="news-lightbox-title"></h3>
+                        <time id="news-lightbox-date"></time>
+                    </div>
+                    <p id="news-lightbox-text"></p>
+                    <div class="news-lightbox-actions">
+                        <a id="news-lightbox-download" class="ghost-button" href="#" download target="_blank">Descargar</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</body>
+</html>
