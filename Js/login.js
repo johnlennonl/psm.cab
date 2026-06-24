@@ -1,8 +1,10 @@
 "use strict";
 
 const VALID_IDENTITIES = [
-    { documentType: "V", documentNumber: "24485562" },
-    { documentType: "E", documentNumber: "87654321" }
+    { documentType: "V", documentNumber: "24485562", role: "student", name: "John Lennon" },
+    { documentType: "V", documentNumber: "11111111", role: "teacher", name: "Prof. Laura Salazar" },
+    { documentType: "V", documentNumber: "99999999", role: "admin", name: "Admin PSM" },
+    { documentType: "E", documentNumber: "87654321", role: "student", name: "Estudiante Invitado" }
 ];
 const VALID_PASSWORD = "123456";
 const NETWORK_DELAY_MS = 1500;
@@ -60,19 +62,20 @@ function setLoadingState(elements, isLoading) {
 function authenticateUser(documentType, documentNumber, password) {
     return new Promise((resolve) => {
         window.setTimeout(() => {
-            const hasValidIdentity = VALID_IDENTITIES.some((identity) => {
+            const validIdentity = VALID_IDENTITIES.find((identity) => {
                 return identity.documentType === documentType && identity.documentNumber === documentNumber;
             });
             const hasValidPassword = password === VALID_PASSWORD;
 
-            if (!hasValidIdentity || !hasValidPassword) {
+            if (!validIdentity || !hasValidPassword) {
                 resolve({ success: false, token: null });
                 return;
             }
 
             resolve({
                 success: true,
-                token: createFakeJwt(`${documentType}-${documentNumber}`)
+                token: createFakeJwt(`${documentType}-${documentNumber}`),
+                user: validIdentity
             });
         }, NETWORK_DELAY_MS);
     });
@@ -86,8 +89,11 @@ function createFakeJwt(subject) {
     return `${header}.${payload}.${signature}`;
 }
 
-function saveSessionToken(token) {
+function saveSessionToken(token, user) {
     localStorage.setItem("psm_auth_token", token);
+    localStorage.setItem("psm_user_role", user.role);
+    localStorage.setItem("psm_user_name", user.name);
+    localStorage.setItem("psm_user_document", `${user.documentType}-${user.documentNumber}`);
 }
 
 function redirectAfterLogin() {
@@ -134,7 +140,7 @@ async function handleSubmit(event, elements) {
             return;
         }
 
-        saveSessionToken(authResult.token);
+        saveSessionToken(authResult.token, authResult.user);
         redirectAfterLogin();
     } catch (error) {
         showError(elements.errorBox, "No se pudo procesar el inicio de sesion. Intenta nuevamente.");

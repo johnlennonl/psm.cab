@@ -2,156 +2,134 @@
 
 const DASHBOARD_LOADER_DELAY_MS = 1400;
 const PROFILE_STORAGE_KEY = "psm_profile_data";
+const ROLE_STORAGE_KEY = "psm_user_role";
+const ATTENDANCE_STORAGE_KEY = "psm_teacher_attendance_records";
 
-const dashboardData = {
-    student: {
-        name: "John Lennon",
-        document: "V-24485562",
-        career: "Ingenieria de Sistemas",
-        birthdate: "2001-10-09",
-        semester: "I Semestre",
-        average: "17.8",
-        enrolledSubjects: 8,
-        status: "Activo",
-        photo: ""
-    },
-    stats: [
-        { label: "Promedio general", value: "17.8", icon: "fa-chart-simple", tone: "blue" },
-        { label: "Materias inscritas", value: "8", icon: "fa-book-open", tone: "gold" },
-        { label: "Mensajes nuevos", value: "4", icon: "fa-envelope-open-text", tone: "sky" },
-        { label: "Solvencia", value: "OK", icon: "fa-circle-check", tone: "green" }
-    ],
-    schedule: [
-        { day: "Lunes", subject: "Matematica I", time: "12:15 PM - 2:30 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#0b3a6e" },
-        { day: "Lunes", subject: "Actividad de Orientacion", time: "2:30 PM - 4:00 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#067647" },
-        { day: "Lunes", subject: "Algebra I", time: "4:00 PM - 5:30 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#7a2e0e" },
-        { day: "Martes", subject: "Metodologia de la Investigacion I", time: "12:15 PM - 2:30 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#6941c6" },
-        { day: "Martes", subject: "Actividad de Orientacion", time: "2:30 PM - 4:00 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#067647" },
-        { day: "Martes", subject: "Algebra I", time: "4:00 PM - 5:30 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#7a2e0e" },
-        { day: "Miercoles", subject: "Actividad de Formacion Cultural I", time: "12:15 PM - 1:45 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#b42318" },
-        { day: "Miercoles", subject: "Introduccion a la Computacion", time: "1:45 PM - 4:00 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#0e7090" },
-        { day: "Jueves", subject: "Matematica I", time: "1:00 PM - 3:15 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#0b3a6e" },
-        { day: "Jueves", subject: "Introduccion a la Ingenieria de Sistemas", time: "4:00 PM - 6:15 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#475467" },
-        { day: "Viernes", subject: "Lenguaje y Comunicacion", time: "1:45 PM - 4:00 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#175cd3" },
-        { day: "Viernes", subject: "Educacion Salud Fisica y Deportes I", time: "4:00 PM - 5:30 PM", room: "Aula por asignar", teacher: "Docente PSM", mode: "Presencial", accent: "#067647" }
-    ],
-    grades: [
-        { subject: "Introduccion a la Computacion", score: 20, status: "Excelente rendimiento" },
-        { subject: "Introduccion a la Ingenieria de Sistemas", score: 19, status: "Excelente rendimiento" },
-        { subject: "Matematica I", score: 20, status: "Excelente rendimiento" },
-        { subject: "Algebra I", score: 17, status: "Aprobado" }
-    ],
-    notifications: [
-        { title: "Nota publicada", text: "Programacion II ya tiene nota del segundo corte.", time: "Hace 12 min", icon: "fa-chart-line" },
-        { title: "Horario actualizado", text: "Redes I cambio al laboratorio principal este viernes.", time: "Hoy", icon: "fa-calendar-check" },
-        { title: "Solvencia activa", text: "Tu estatus administrativo esta al dia.", time: "Ayer", icon: "fa-circle-check" }
-    ],
-    messages: [
-        { title: "Coordinacion academica", text: "Recuerda validar tu carga academica antes del viernes.", time: "09:20 AM", icon: "fa-building-columns" },
-        { title: "Prof. Salazar", text: "Subi material de practica para el laboratorio de Programacion II.", time: "Ayer", icon: "fa-user-tie" },
-        { title: "Control de estudios", text: "Disponible constancia de estudios digital.", time: "Lunes", icon: "fa-file-lines" }
-    ],
-    news: [
-        { title: "Jornada de investigacion estudiantil", text: "Participa con tus proyectos academicos y prototipos tecnologicos.", date: "18 Jun 2026", image: "../img/WhatsApp Image 2026-06-18 at 10.26.34 AM (1).jpeg" },
-        { title: "Inscripciones intensivo", text: "Consulta materias disponibles para el periodo academico especial.", date: "20 Jun 2026", image: "../img/WhatsApp Image 2026-06-18 at 10.26.34 AM.jpeg" },
-        { title: "Feria de empleabilidad", text: "Empresas aliadas visitaran el campus para entrevistas y charlas.", date: "25 Jun 2026", image: "../img/WhatsApp Image 2026-06-18 at 10.27.44 AM.jpeg" }
-    ],
-    pensum: [
-        { semester: "I Semestre", status: "active", subjects: [
-            { code: "4701111", name: "ACTIVIDAD DE FORMACION CULTURAL I", ht: "0", hp: "2", hl: "0", th: "2", uc: "1", pre: "S/P" },
-            { code: "4701121", name: "LENGUAJE Y COMUNICACION", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "S/P" },
-            { code: "4701131", name: "ALGEBRA I", ht: "2", hp: "0", hl: "0", th: "4", uc: "3", pre: "S/P" },
-            { code: "4701141", name: "MATEMATICAS I", ht: "3", hp: "2", hl: "0", th: "5", uc: "4", pre: "S/P" },
-            { code: "4702111", name: "EDUCACION SALUD FISICA Y DEPORTES I", ht: "0", hp: "2", hl: "0", th: "2", uc: "1", pre: "S/P" },
-            { code: "4702121", name: "ACTIVIDAD DE ORIENTACION", ht: "0", hp: "4", hl: "0", th: "4", uc: "2", pre: "S/P" },
-            { code: "4703121", name: "METODOLOGIA DE LA INVESTIGACION I", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "S/P" },
-            { code: "4704121", name: "INTRODUCCION A LA INGENIERIA DE SISTEMAS", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "S/P" },
-            { code: "4705121", name: "INTRODUCCION A LA COMPUTACION", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "S/P" }
-        ]},
-        { semester: "II Semestre", status: "pending", subjects: [
-            { code: "4701112", name: "ACTIVIDAD DE FORMACION CULTURAL II", ht: "0", hp: "2", hl: "0", th: "2", uc: "1", pre: "S/P" },
-            { code: "4701122", name: "INGLES I", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "S/P" },
-            { code: "4701222", name: "LENGUAJE DE PROGRAMACION I", ht: "1", hp: "3", hl: "0", th: "4", uc: "2", pre: "4704121-4705121" },
-            { code: "4701232", name: "ALGEBRA LINEAL", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4701131-4701141" },
-            { code: "4701242", name: "MATEMATICAS II", ht: "3", hp: "2", hl: "0", th: "5", uc: "4", pre: "4701141" },
-            { code: "4702112", name: "EDUCACION SALUD FISICA Y DEPORTES II", ht: "0", hp: "2", hl: "0", th: "2", uc: "1", pre: "S/P" },
-            { code: "4702222", name: "ECONOMIA GENERAL", ht: "2", hp: "0", hl: "0", th: "2", uc: "2", pre: "S/P" },
-            { code: "4702232", name: "FISICA I", ht: "2", hp: "3", hl: "0", th: "5", uc: "3", pre: "4701141" },
-            { code: "4703222", name: "INTRODUCCION A LA ADMINISTRACION", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "S/P" }
-        ]},
-        { semester: "III Semestre", status: "pending", subjects: [
-            { code: "4701223", name: "INGLES II", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "4701122" },
-            { code: "4701233", name: "CONTABILIDAD I", ht: "2", hp: "3", hl: "0", th: "5", uc: "3", pre: "S/P" },
-            { code: "4701243", name: "MATEMATICAS III", ht: "3", hp: "2", hl: "0", th: "5", uc: "4", pre: "4701242" },
-            { code: "4701323", name: "LENGUAJE DE PROGRAMACION II", ht: "1", hp: "3", hl: "0", th: "4", uc: "2", pre: "4701222" },
-            { code: "4701333", name: "TEORIA DE SISTEMAS", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4704121" },
-            { code: "4702243", name: "FISICA II", ht: "3", hp: "2", hl: "0", th: "5", uc: "4", pre: "4702232-4701242" }
-        ]},
-        { semester: "IV Semestre", status: "pending", subjects: [
-            { code: "4701224", name: "LABORATORIO DE FISICA", ht: "1", hp: "0", hl: "3", th: "4", uc: "2", pre: "4702243" },
-            { code: "4701234", name: "CONTABILIDAD II", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4701233" },
-            { code: "4701244", name: "MATEMATICAS IV", ht: "3", hp: "2", hl: "0", th: "5", uc: "4", pre: "4701243" },
-            { code: "4701324", name: "LENGUAJE DE PROGRAMACION III", ht: "1", hp: "3", hl: "0", th: "4", uc: "2", pre: "4701323" },
-            { code: "4701334", name: "ELECTIVA I", ht: "3", hp: "0", hl: "0", th: "3", uc: "3", pre: "57 UCA" },
-            { code: "4702334", name: "ESTADISTICA I", ht: "2", hp: "3", hl: "0", th: "5", uc: "3", pre: "4701242" },
-            { code: "4703334", name: "ESTRUCTURAS DISCRETAS Y GRAFOS", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4701242-4701323" }
-        ]},
-        { semester: "V Semestre", status: "pending", subjects: [
-            { code: "4701325", name: "TEORIA DE LA ORGANIZACION", ht: "2", hp: "0", hl: "0", th: "2", uc: "2", pre: "4703222-4701333" },
-            { code: "4701335", name: "ELECTIVA II", ht: "3", hp: "0", hl: "0", th: "3", uc: "3", pre: "77 UCA" },
-            { code: "4702335", name: "ESTADISTICA II", ht: "2", hp: "3", hl: "0", th: "5", uc: "3", pre: "4702334" },
-            { code: "4703335", name: "ANALISIS Y DISEÑO DE SISTEMAS", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4701333" },
-            { code: "4704335", name: "BASE DE DATOS", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4701324-4703334" },
-            { code: "4705335", name: "ESTRUCTURA DE DATOS", ht: "2", hp: "3", hl: "0", th: "5", uc: "3", pre: "4701324" },
-            { code: "4706335", name: "PROGRAMACION NUMERICA", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4701324-4701244" }
-        ]},
-        { semester: "VI Semestre", status: "pending", subjects: [
-            { code: "470006", name: "TALLER DE INDUCCION AL SERVICIO COMUNITARIO", ht: "4", hp: "0", hl: "0", th: "4", uc: "0", pre: "97 UCA" },
-            { code: "4701226", name: "ORGANIZACION DEL COMPUTADOR", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "4701324" },
-            { code: "4701236", name: "METODOLOGIA DE LA INVESTIGACION II", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4703121-97 UCA" },
-            { code: "4701326", name: "TEORIA DE LA INFORMACION", ht: "2", hp: "1", hl: "0", th: "3", uc: "2", pre: "4703335-4704335" },
-            { code: "4701336", name: "ELECTIVA III", ht: "3", hp: "0", hl: "0", th: "3", uc: "3", pre: "97 UCA" },
-            { code: "4702236", name: "SISTEMAS ELECTRICOS", ht: "1", hp: "2", hl: "3", th: "6", uc: "3", pre: "4701224" },
-            { code: "4702326", name: "INGENIERIA ECONOMICA", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "4701244-4702222" },
-            { code: "4702336", name: "SISTEMAS OPERATIVOS I", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4703335" },
-            { code: "4703336", name: "PROGRAMACION NO NUMERICA I", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4706335" }
-        ]},
-        { semester: "VII Semestre", status: "pending", subjects: [
-            { code: "470007", name: "PROYECTO DE SERVICIO COMUNITARIO", ht: "4", hp: "0", hl: "0", th: "4", uc: "0", pre: "470006-118 UCA" },
-            { code: "4701327", name: "SISTEMAS I", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "4703335-4703336" },
-            { code: "4701337", name: "ELECTIVA IV", ht: "3", hp: "0", hl: "0", th: "3", uc: "3", pre: "118 UCA" },
-            { code: "4702337", name: "PLANIFICACION DE SISTEMAS", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4703335-4704335" },
-            { code: "4703337", name: "PROGRAMACION NO NUMERICA II", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4703336" },
-            { code: "4704337", name: "ELECTRONICA DIGITAL", ht: "2", hp: "2", hl: "3", th: "7", uc: "4", pre: "4701226-4702236" },
-            { code: "4704337", name: "INVESTIGACION DE OPERACIONES I", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4701244-4702335" },
-            { code: "4705337", name: "SISTEMAS OPERATIVOS II", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4702336" }
-        ]},
-        { semester: "VIII Semestre", status: "pending", subjects: [
-            { code: "470008", name: "PROYECTO DE SERVICIO COMUNITARIO", ht: "4", hp: "0", hl: "0", th: "4", uc: "0", pre: "470007" },
-            { code: "4701328", name: "SIMULACION DIGITAL", ht: "1", hp: "2", hl: "0", th: "3", uc: "2", pre: "4703347" },
-            { code: "4701338", name: "ELECTIVA V", ht: "3", hp: "0", hl: "0", th: "3", uc: "3", pre: "139 UCA" },
-            { code: "4702328", name: "SISTEMAS Y PROCEDIMIENTOS ADMINISTRATIVOS", ht: "2", hp: "0", hl: "0", th: "2", uc: "2", pre: "4701325" },
-            { code: "4702338", name: "SISTEMAS II", ht: "2", hp: "3", hl: "0", th: "5", uc: "3", pre: "4701327" },
-            { code: "4703338", name: "SISTEMAS DE INFORMACION", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4701326" },
-            { code: "4704338", name: "INVESTIGACION DE OPERACIONES II", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4704337" }
-        ]},
-        { semester: "IX Semestre", status: "pending", subjects: [
-            { code: "4701329", name: "ETICA Y DEONTOLOGIA PROFESIONAL", ht: "2", hp: "0", hl: "0", th: "2", uc: "2", pre: "155 UCA" },
-            { code: "4701339", name: "ELECTIVA VI", ht: "3", hp: "0", hl: "0", th: "3", uc: "3", pre: "155 UCA" },
-            { code: "4701449", name: "PROYECTO DE INVESTIGACION", ht: "2", hp: "6", hl: "0", th: "8", uc: "4", pre: "HASTA EL 8VO. SEM. APROB./155 UCA" },
-            { code: "4702329", name: "ADMINISTRACION DE SISTEMAS DE INFORMACION", ht: "2", hp: "0", hl: "0", th: "2", uc: "2", pre: "4703338" },
-            { code: "4702339", name: "DISEÑO Y EVALUACION DE PROYECTOS", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4704338" },
-            { code: "4703339", name: "OPTIMIZACION DE SISTEMAS Y FUNCIONES", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4704338" },
-            { code: "4704339", name: "AUDITORIA Y EVALUACION DE SISTEMAS", ht: "2", hp: "2", hl: "0", th: "4", uc: "3", pre: "4702338" }
-        ]},
-        { semester: "X Semestre", status: "pending", subjects: [
-            { code: "4714610", name: "TRABAJO DE GRADO", ht: "2", hp: "12", hl: "0", th: "14", uc: "6", pre: "175 UCA" },
-            { code: "4714810", name: "PASANTIA", ht: "0", hp: "20", hl: "0", th: "20", uc: "8", pre: "175 UCA" }
-        ]}
-    ]
-};
+const dashboardData = window.PSM_DASHBOARD_DATA || {};
+const weekDays = window.PSM_WEEK_DAYS || [];
 
-const weekDays = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
+const studentNavigation = window.PSM_STUDENT_NAVIGATION || [];
+const roleDashboards = window.PSM_ROLES || {};
+
+let selectedTeacherSectionId = roleDashboards.teacher?.selectedSectionId || "prog-ii-a";
+let isLabRequestOpen = false;
+let lastLabRequest = null;
+let selectedAttendanceDate = new Date().toISOString().slice(0, 10);
+
+function getTeacherExperience() {
+    return roleDashboards.teacher;
+}
+
+function getSelectedTeacherSection() {
+    const experience = getTeacherExperience();
+    return experience.sections.find((section) => section.id === selectedTeacherSectionId) || experience.sections[0];
+}
+
+function getNumericGrade(value) {
+    const grade = Number(value);
+    return Number.isFinite(grade) ? Math.min(20, Math.max(0, grade)) : null;
+}
+
+function calculateWeightedFinal(grades, gradePlan) {
+    return gradePlan.reduce((total, evaluation) => {
+        const grade = getNumericGrade(grades[evaluation.key]);
+        return grade === null ? total : total + (grade * evaluation.weight / 100);
+    }, 0);
+}
+
+function calculateCutScore(grades, gradePlan, cutName) {
+    const cutEvaluations = gradePlan.filter((evaluation) => evaluation.cut === cutName);
+    const available = cutEvaluations.filter((evaluation) => getNumericGrade(grades[evaluation.key]) !== null);
+
+    if (!available.length) {
+        return null;
+    }
+
+    const weightedScore = available.reduce((total, evaluation) => {
+        return total + (getNumericGrade(grades[evaluation.key]) * evaluation.weight);
+    }, 0);
+    const totalWeight = available.reduce((total, evaluation) => total + evaluation.weight, 0);
+
+    return weightedScore / totalWeight;
+}
+
+function getCompletedCutScores(grades, gradePlan) {
+    const cutNames = [...new Set(gradePlan.map((evaluation) => evaluation.cut))];
+
+    return cutNames.reduce((completedCuts, cutName) => {
+        const cutEvaluations = gradePlan.filter((evaluation) => evaluation.cut === cutName);
+        const isCutComplete = cutEvaluations.every((evaluation) => getNumericGrade(grades[evaluation.key]) !== null);
+
+        if (!isCutComplete) {
+            return completedCuts;
+        }
+
+        return [
+            ...completedCuts,
+            {
+                cut: cutName,
+                score: calculateCutScore(grades, gradePlan, cutName)
+            }
+        ];
+    }, []);
+}
+
+function getCompletedGradeValues(grades, gradePlan) {
+    return gradePlan
+        .map((evaluation) => getNumericGrade(grades[evaluation.key]))
+        .filter((grade) => grade !== null);
+}
+
+function calculateCurrentAverage(grades, gradePlan) {
+    const completedGrades = getCompletedGradeValues(grades, gradePlan);
+
+    if (!completedGrades.length) {
+        return null;
+    }
+
+    return completedGrades.reduce((total, grade) => total + grade, 0) / completedGrades.length;
+}
+
+function formatGrade(value) {
+    if (value === null || Number.isNaN(value)) {
+        return "Pendiente";
+    }
+
+    return value.toFixed(1);
+}
+
+function loadAttendanceRecords() {
+    const savedRecords = localStorage.getItem(ATTENDANCE_STORAGE_KEY);
+
+    if (!savedRecords) {
+        return {};
+    }
+
+    try {
+        return JSON.parse(savedRecords);
+    } catch (error) {
+        localStorage.removeItem(ATTENDANCE_STORAGE_KEY);
+        return {};
+    }
+}
+
+function saveAttendanceRecords(records) {
+    localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(records));
+}
+
+function getAttendanceStatus(sectionId, student, date) {
+    const records = loadAttendanceRecords();
+    return records[sectionId]?.[date]?.[student.document] || student.attendance || "Presente";
+}
+
+function setAttendanceStatus(sectionId, student, date, status) {
+    const records = loadAttendanceRecords();
+
+    records[sectionId] = records[sectionId] || {};
+    records[sectionId][date] = records[sectionId][date] || {};
+    records[sectionId][date][student.document] = status;
+    saveAttendanceRecords(records);
+}
 
 function getElements() {
     return {
@@ -173,12 +151,22 @@ function getElements() {
         nextClassTitle: document.querySelector("#next-class-title"),
         nextClassDetail: document.querySelector("#next-class-detail"),
         pensumList: document.querySelector("#pensum-list"),
+        sidebarNav: document.querySelector(".sidebar-nav"),
+        contentGrid: document.querySelector(".content-grid"),
+        topbarEyebrow: document.querySelector(".topbar-title p"),
+        heroPanel: document.querySelector("#overview"),
         profileButton: document.querySelector("#profile-button"),
         profileModal: document.querySelector("#profile-modal"),
+        profileModalTitle: document.querySelector("#profile-modal-title"),
+        profilePhotoTitle: document.querySelector("#profile-photo-title"),
+        profilePhotoCopy: document.querySelector("#profile-photo-copy"),
         profileForm: document.querySelector("#profile-form"),
         profileCloseButton: document.querySelector("#profile-close-button"),
         profileAvatarPreview: document.querySelector("#profile-avatar-preview"),
         profilePhotoInput: document.querySelector("#profile-photo-input"),
+        profileBirthdateLabel: document.querySelector("#profile-birthdate-label"),
+        profileDocumentLabel: document.querySelector("#profile-document-label"),
+        profileCareerLabel: document.querySelector("#profile-career-label"),
         profileBirthdate: document.querySelector("#profile-birthdate"),
         profileDocument: document.querySelector("#profile-document"),
         profileCareer: document.querySelector("#profile-career")
@@ -274,7 +262,7 @@ function getInitials(name) {
 }
 
 function loadProfileData() {
-    const savedProfile = localStorage.getItem(PROFILE_STORAGE_KEY);
+    const savedProfile = localStorage.getItem(getProfileStorageKey());
 
     if (!savedProfile) {
         return;
@@ -292,7 +280,26 @@ function loadProfileData() {
 }
 
 function saveProfileData(profile) {
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+    localStorage.setItem(getProfileStorageKey(), JSON.stringify(profile));
+}
+
+function getProfileStorageKey() {
+    return `${PROFILE_STORAGE_KEY}_${getCurrentRole()}`;
+}
+
+function loadSavedProfile() {
+    const savedProfile = localStorage.getItem(getProfileStorageKey());
+
+    if (!savedProfile) {
+        return {};
+    }
+
+    try {
+        return JSON.parse(savedProfile);
+    } catch (error) {
+        localStorage.removeItem(getProfileStorageKey());
+        return {};
+    }
 }
 
 function renderAvatar(container, student) {
@@ -316,12 +323,34 @@ function renderStudent(elements) {
 }
 
 function syncProfileForm(elements) {
-    elements.profileBirthdate.value = dashboardData.student.birthdate || "";
-    elements.profileDocument.value = dashboardData.student.document || "";
-    elements.profileCareer.value = dashboardData.student.career || "";
+    const role = getCurrentRole();
+    const savedProfile = loadSavedProfile();
+    const isTeacher = role === "teacher";
+    const baseProfile = isTeacher
+        ? {
+            name: getSessionName(getTeacherExperience().identity.name),
+            document: localStorage.getItem("psm_user_document") || "V-11111111",
+            career: savedProfile.career || "Ingenieria de Sistemas",
+            birthdate: savedProfile.birthdate || "",
+            photo: savedProfile.photo || ""
+        }
+        : dashboardData.student;
+
+    elements.profileModalTitle.textContent = isTeacher ? "Ficha del profesor" : "Ficha del estudiante";
+    elements.profilePhotoTitle.textContent = isTeacher ? "Actualiza tu foto docente" : "Cambia tu foto de perfil";
+    elements.profilePhotoCopy.textContent = isTeacher
+        ? "Esta imagen identifica tu perfil ante estudiantes y administracion."
+        : "Sube una imagen para que tu ficha academica se vea brutal.";
+    elements.profileBirthdateLabel.textContent = "Fecha de Nacimiento";
+    elements.profileDocumentLabel.textContent = "Cedula de Identidad";
+    elements.profileCareerLabel.textContent = isTeacher ? "Departamento o especialidad" : "Carrera que esta cursando";
+    elements.profileCareer.placeholder = isTeacher ? "Ingenieria de Sistemas" : "Ingenieria de Sistemas";
+    elements.profileBirthdate.value = baseProfile.birthdate || "";
+    elements.profileDocument.value = baseProfile.document || "";
+    elements.profileCareer.value = baseProfile.career || "";
     elements.profilePhotoInput.value = "";
-    elements.profileAvatarPreview.dataset.photo = dashboardData.student.photo || "";
-    renderAvatar(elements.profileAvatarPreview, dashboardData.student);
+    elements.profileAvatarPreview.dataset.photo = baseProfile.photo || "";
+    renderAvatar(elements.profileAvatarPreview, baseProfile);
 }
 
 function getFocusableProfileElements(elements) {
@@ -367,13 +396,25 @@ function handleProfilePhotoChange(event, elements) {
 
 function handleProfileSubmit(event, elements) {
     event.preventDefault();
+    const role = getCurrentRole();
 
     const updatedProfile = {
         birthdate: elements.profileBirthdate.value,
         document: elements.profileDocument.value.trim(),
-        career: elements.profileCareer.value.trim() || dashboardData.student.career,
+        career: elements.profileCareer.value.trim() || (role === "teacher" ? "Ingenieria de Sistemas" : dashboardData.student.career),
         photo: elements.profileAvatarPreview.dataset.photo || ""
     };
+
+    if (role === "teacher") {
+        saveProfileData(updatedProfile);
+        elements.studentCareer.textContent = `Docente | ${updatedProfile.career}`;
+        renderAvatar(elements.studentAvatar, {
+            name: getSessionName(getTeacherExperience().identity.name),
+            photo: updatedProfile.photo
+        });
+        closeProfileModal(elements);
+        return;
+    }
 
     dashboardData.student = {
         ...dashboardData.student,
@@ -491,6 +532,712 @@ function renderStackList(container, items) {
             </article>
         `;
     }).join("");
+}
+
+function getCurrentRole() {
+    const role = localStorage.getItem(ROLE_STORAGE_KEY) || "student";
+    return roleDashboards[role] ? role : "student";
+}
+
+function getSessionName(fallbackName) {
+    return localStorage.getItem("psm_user_name") || fallbackName;
+}
+
+function renderNavigation(elements, navItems) {
+    elements.sidebarNav.innerHTML = navItems.map((item, index) => {
+        return `
+            <a class="nav-link${index === 0 ? " active" : ""}" href="${item.href}">
+                <i class="fa-solid ${item.icon}" aria-hidden="true"></i>
+                <span>${item.label}</span>
+            </a>
+        `;
+    }).join("");
+}
+
+function renderRoleIdentity(elements, experience) {
+    const name = getSessionName(experience.identity.name);
+    const firstName = name.split(" ")[0];
+    const savedProfile = loadSavedProfile();
+
+    elements.welcomeName.textContent = firstName;
+    elements.studentName.textContent = name;
+    elements.studentCareer.textContent = getCurrentRole() === "teacher" && savedProfile.career
+        ? `Docente | ${savedProfile.career}`
+        : experience.identity.subtitle;
+    renderAvatar(elements.studentAvatar, {
+        name,
+        photo: savedProfile.photo || ""
+    });
+    elements.topbarEyebrow.textContent = experience.topbarLabel;
+}
+
+function renderRoleHero(elements, hero) {
+    const status = elements.heroPanel.querySelector(".status-pill");
+    const title = elements.heroPanel.querySelector("h2");
+    const text = elements.heroPanel.querySelector("p");
+    const highlightLabel = elements.heroPanel.querySelector(".hero-next-class span");
+
+    status.textContent = hero.status;
+    title.textContent = hero.title;
+    text.textContent = hero.text;
+    highlightLabel.textContent = hero.highlightLabel;
+    elements.nextClassTitle.textContent = hero.highlightTitle;
+    elements.nextClassDetail.textContent = hero.highlightDetail;
+}
+
+function getTeacherHero(experience) {
+    const selectedSection = getSelectedTeacherSection();
+
+    return {
+        ...experience.hero,
+        status: `${selectedSection.period} | ${selectedSection.code} | Seccion ${selectedSection.section}`,
+        title: `${selectedSection.subject} | Seccion ${selectedSection.section}`,
+        text: `Estas trabajando en ${selectedSection.room}. Usa este contexto para asistencia, notas, planificacion y seguimiento.`,
+        highlightLabel: "Asignatura activa",
+        highlightTitle: selectedSection.code,
+        highlightDetail: `${selectedSection.nextClass} | ${selectedSection.schedule}`
+    };
+}
+
+function renderRoleStats(elements, stats) {
+    elements.statsGrid.innerHTML = stats.map((stat) => {
+        return `
+            <article class="stat-card stat-card-${stat.tone}">
+                <strong class="stat-card-value">${stat.value}</strong>
+                <span class="stat-card-label">${stat.label}</span>
+                <span class="stat-card-icon"><i class="fa-solid ${stat.icon}" aria-hidden="true"></i></span>
+            </article>
+        `;
+    }).join("");
+}
+
+function countPendingGrades(section) {
+    return section.students.reduce((total, student) => {
+        return total + Object.values(student.grades).filter((grade) => grade === "" || grade === null || grade === undefined).length;
+    }, 0);
+}
+
+function getTeacherRiskStudents(section) {
+    return section.students
+        .map((student) => ({ ...student, risk: getStudentRisk(student) }))
+        .filter((student) => student.risk);
+}
+
+function getTeacherStats(experience) {
+    const section = getSelectedTeacherSection();
+
+    return [
+        {
+            label: "Secciones activas",
+            value: String(experience.sections.length),
+            icon: "fa-chalkboard-user",
+            tone: "blue"
+        },
+        {
+            label: "Estudiantes",
+            value: String(section.students.length),
+            icon: "fa-users",
+            tone: "sky"
+        },
+        {
+            label: "Notas pendientes",
+            value: String(countPendingGrades(section)),
+            icon: "fa-pen-to-square",
+            tone: "gold"
+        },
+        {
+            label: "Riesgo academico",
+            value: String(getTeacherRiskStudents(section).length),
+            icon: "fa-triangle-exclamation",
+            tone: "red"
+        }
+    ];
+}
+
+function renderRolePanels(elements, panels) {
+    elements.contentGrid.innerHTML = panels.map((panel) => {
+        return `
+            <article id="${panel.id}" class="panel role-panel role-panel-${panel.type}">
+                <div class="section-heading">
+                    <div>
+                        <p>${panel.kicker}</p>
+                        <h2>${panel.title}</h2>
+                    </div>
+                </div>
+                ${renderRolePanelContent(panel)}
+            </article>
+        `;
+    }).join("");
+}
+
+function renderRolePanelContent(panel) {
+    const renderers = {
+        cards: renderRoleCards,
+        attendance: renderAttendanceList,
+        table: renderRoleTable,
+        timeline: renderTimelineList,
+        people: renderPeopleList,
+        actions: renderActionList,
+        metrics: renderMetricList,
+        teacherSections: renderTeacherSections,
+        teacherContext: renderTeacherContext,
+        teacherAttendance: renderTeacherAttendance,
+        teacherGradebook: renderTeacherGradebook,
+        teacherPlanning: renderTeacherPlanning,
+        teacherRisk: renderTeacherRisk
+    };
+
+    return renderers[panel.type] ? renderers[panel.type](panel) : "";
+}
+
+function renderTeacherSections() {
+    const experience = getTeacherExperience();
+
+    return `
+        <div class="teacher-section-grid">
+            ${experience.sections.map((section) => `
+                <button class="teacher-section-card${section.id === selectedTeacherSectionId ? " is-selected" : ""}" type="button" data-section-id="${section.id}" style="--section-accent: ${section.accent}">
+                    <span>${section.code} | Seccion ${section.section}</span>
+                    <strong>${section.subject}</strong>
+                    <small>${section.schedule}</small>
+                    <em>${section.students.length} alumnos | ${section.status}</em>
+                </button>
+            `).join("")}
+        </div>
+    `;
+}
+
+function renderTeacherContext() {
+    const section = getSelectedTeacherSection();
+    const presentCount = section.students.filter((student) => getAttendanceStatus(section.id, student, selectedAttendanceDate) === "Presente").length;
+    const pendingGrades = countPendingGrades(section);
+
+    return `
+        <div class="section-context-card" style="--section-accent: ${section.accent}">
+            <div class="section-context-main">
+                <span>${section.code} | Seccion ${section.section} | ${section.period}</span>
+                <strong>${section.subject}</strong>
+                <p>${section.room} | ${section.schedule}</p>
+            </div>
+            <div class="section-context-metrics">
+                <article><strong>${section.students.length}</strong><span>Alumnos</span></article>
+                <article><strong>${presentCount}</strong><span>Presentes hoy</span></article>
+                <article><strong>${pendingGrades}</strong><span>Notas pendientes</span></article>
+            </div>
+            <div class="section-context-actions">
+                <a class="ghost-button" href="#attendance"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i><span>Tomar asistencia</span></a>
+                <a class="ghost-button" href="#gradebook"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i><span>Cargar notas</span></a>
+            </div>
+        </div>
+    `;
+}
+
+function renderTeacherPlanning() {
+    const section = getSelectedTeacherSection();
+
+    return `
+        <div class="teacher-panel-intro">
+            <strong>${section.subject} | Seccion ${section.section}</strong>
+            <span>Planificacion vinculada a ${section.code}, no a otras asignaturas.</span>
+        </div>
+        <div class="timeline-list">
+            ${section.planning.map((item) => `
+                <article class="timeline-item">
+                    <span><i class="fa-solid ${item.icon}" aria-hidden="true"></i></span>
+                    <div>
+                        <strong>${item.title}</strong>
+                        <p>${item.text}</p>
+                    </div>
+                </article>
+            `).join("")}
+        </div>
+    `;
+}
+
+function getStudentRisk(student) {
+    const gradePlan = getTeacherExperience().gradePlan;
+    const completedCuts = getCompletedCutScores(student.grades, gradePlan);
+
+    if (completedCuts.length < 2) {
+        return null;
+    }
+
+    const lowCuts = completedCuts.filter((cut) => cut.score <= 8);
+
+    if (lowCuts.length >= 2) {
+        return {
+            badge: "Alto",
+            reason: lowCuts.map((cut) => `${cut.cut}: ${formatGrade(cut.score)}`).join(" | ")
+        };
+    }
+
+    return null;
+}
+
+function renderTeacherRisk() {
+    const section = getSelectedTeacherSection();
+    const riskStudents = getTeacherRiskStudents(section);
+
+    if (!riskStudents.length) {
+        return `
+            <div class="teacher-panel-intro">
+                <strong>${section.subject} | Seccion ${section.section}</strong>
+                <span>No hay alumnos en riesgo con la evidencia actual.</span>
+            </div>
+            <p class="muted">Este panel se activa cuando hay al menos dos cortes completamente evaluados y el estudiante tiene 08 o menos en dos cortes.</p>
+        `;
+    }
+
+    return `
+        <div class="teacher-panel-intro">
+            <strong>${section.subject} | Seccion ${section.section}</strong>
+            <span>Seguimiento calculado solo con alumnos inscritos en esta seccion.</span>
+        </div>
+        <div class="people-list">
+            ${riskStudents.map((student) => `
+                <article class="person-row">
+                    ${renderStudentIdentity(student, `${section.subject} | ${student.risk.reason}`)}
+                    <div class="person-actions">
+                        <em>${student.risk.badge}</em>
+                        <button class="contact-student-button" type="button" data-student-name="${student.name}" data-student-document="${student.document}">
+                            <i class="fa-solid fa-message" aria-hidden="true"></i>
+                            <span>Contactar</span>
+                        </button>
+                    </div>
+                </article>
+            `).join("")}
+        </div>
+    `;
+}
+
+function renderStudentIdentity(student, detail) {
+    return `
+        <div class="student-mini-identity">
+            <span class="student-mini-avatar" aria-hidden="true">
+                <i class="fa-solid fa-user-graduate"></i>
+            </span>
+            <div>
+                <strong>${student.name}</strong>
+                <span>${detail || student.document}</span>
+            </div>
+        </div>
+    `;
+}
+
+function renderTeacherAttendance() {
+    const section = getSelectedTeacherSection();
+    const attendanceSummary = section.students.reduce((summary, student) => {
+        const status = getAttendanceStatus(section.id, student, selectedAttendanceDate);
+
+        summary[status] = (summary[status] || 0) + 1;
+        return summary;
+    }, { Presente: 0, Tarde: 0, Ausente: 0 });
+
+    return `
+        <div class="teacher-panel-intro">
+            <strong>${section.subject} | Seccion ${section.section}</strong>
+            <span>${section.nextClass} | Asistencia diaria</span>
+        </div>
+        <div class="attendance-toolbar">
+            <label for="attendance-date-input">
+                <span>Fecha de clase</span>
+                <input id="attendance-date-input" type="date" value="${selectedAttendanceDate}">
+            </label>
+            <div class="attendance-summary" aria-label="Resumen de asistencia">
+                <span><strong>${attendanceSummary.Presente}</strong> Presentes</span>
+                <span><strong>${attendanceSummary.Tarde}</strong> Tardes</span>
+                <span><strong>${attendanceSummary.Ausente}</strong> Ausentes</span>
+            </div>
+        </div>
+        <div class="attendance-list">
+            ${section.students.map((student) => `
+                <article class="attendance-item">
+                    ${renderStudentIdentity(student)}
+                    <div class="attendance-controls" aria-label="Asistencia de ${student.name}" data-student-index="${section.students.indexOf(student)}">
+                        ${["Presente", "Tarde", "Ausente"].map((status) => `
+                            <button class="attendance-chip${getAttendanceStatus(section.id, student, selectedAttendanceDate) === status ? " is-active" : ""}" type="button" data-attendance-status="${status}">${status}</button>
+                        `).join("")}
+                    </div>
+                </article>
+            `).join("")}
+        </div>
+    `;
+}
+
+function renderTeacherGradebook() {
+    const experience = getTeacherExperience();
+    const section = getSelectedTeacherSection();
+    const cuts = ["Primer corte", "Segundo corte", "Tercer corte"];
+
+    return `
+        <div class="teacher-panel-intro">
+            <strong>${section.subject} | ${section.code} | Seccion ${section.section}</strong>
+            <span>Evaluaciones: 10% + 20%, 10% + 20%, 20% + 20% = 100%</span>
+        </div>
+        <div class="grade-plan-strip" aria-label="Plan de evaluacion">
+            ${experience.gradePlan.map((evaluation) => `
+                <span>${evaluation.label}</span>
+            `).join("")}
+        </div>
+        <div class="role-table-wrap gradebook-wrap">
+            <table class="role-table gradebook-table">
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        ${experience.gradePlan.map((evaluation) => `<th>${evaluation.label}</th>`).join("")}
+                        ${cuts.map((cut) => `<th>${cut}</th>`).join("")}
+                        <th>Acum./Final</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${section.students.map((student, studentIndex) => {
+                        const cutCells = cuts.map((cut) => `<td class="grade-total">${formatGrade(calculateCutScore(student.grades, experience.gradePlan, cut))}</td>`).join("");
+                        const finalScore = calculateWeightedFinal(student.grades, experience.gradePlan);
+
+                        return `
+                            <tr>
+                                <td>
+                                    ${renderStudentIdentity(student)}
+                                </td>
+                                ${experience.gradePlan.map((evaluation) => `
+                                    <td>
+                                        <input class="grade-input" type="number" min="0" max="20" step="0.1" value="${student.grades[evaluation.key]}" data-student-index="${studentIndex}" data-grade-key="${evaluation.key}" aria-label="${evaluation.label} de ${student.name}">
+                                    </td>
+                                `).join("")}
+                                ${cutCells}
+                                <td class="grade-final${finalScore < 10 ? " is-risk" : ""}">${formatGrade(finalScore)}</td>
+                            </tr>
+                        `;
+                    }).join("")}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+function renderRoleCards(panel) {
+    return `
+        <div class="role-card-grid">
+            ${panel.items.map((item) => `
+                <article class="role-card-item">
+                    <div>
+                        <strong>${item.title}</strong>
+                        <span>${item.meta}</span>
+                    </div>
+                    <p>${item.text}</p>
+                    <em>${item.status}</em>
+                </article>
+            `).join("")}
+        </div>
+    `;
+}
+
+function renderAttendanceList(panel) {
+    return `
+        <div class="attendance-list">
+            ${panel.items.map((item) => `
+                <article class="attendance-item">
+                    <div>
+                        <strong>${item.name}</strong>
+                        <span>${item.document}</span>
+                    </div>
+                    <div class="attendance-controls" aria-label="Asistencia de ${item.name}">
+                        ${["Presente", "Tarde", "Ausente"].map((status) => `
+                            <button class="attendance-chip${item.status === status ? " is-active" : ""}" type="button">${status}</button>
+                        `).join("")}
+                    </div>
+                </article>
+            `).join("")}
+        </div>
+    `;
+}
+
+function renderRoleTable(panel) {
+    return `
+        <div class="role-table-wrap">
+            <table class="role-table">
+                <thead>
+                    <tr>${panel.columns.map((column) => `<th>${column}</th>`).join("")}</tr>
+                </thead>
+                <tbody>
+                    ${panel.rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+function renderTimelineList(panel) {
+    return `
+        <div class="timeline-list">
+            ${panel.items.map((item) => `
+                <article class="timeline-item">
+                    <span><i class="fa-solid ${item.icon}" aria-hidden="true"></i></span>
+                    <div>
+                        <strong>${item.title}</strong>
+                        <p>${item.text}</p>
+                    </div>
+                </article>
+            `).join("")}
+        </div>
+    `;
+}
+
+function renderPeopleList(panel) {
+    return `
+        <div class="people-list">
+            ${panel.items.map((item) => `
+                <article class="person-row">
+                    <div>
+                        <strong>${item.name}</strong>
+                        <span>${item.detail}</span>
+                    </div>
+                    <em>${item.badge}</em>
+                </article>
+            `).join("")}
+        </div>
+    `;
+}
+
+function renderActionList(panel) {
+    if (getCurrentRole() === "teacher" && panel.id === "teacher-messages") {
+        return renderTeacherActions(panel);
+    }
+
+    return `
+        <div class="action-list">
+            ${panel.items.map((item) => `
+                <button class="action-row" type="button">
+                    <span><i class="fa-solid ${item.icon}" aria-hidden="true"></i></span>
+                    <div>
+                        <strong>${item.title}</strong>
+                        <small>${item.text}</small>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </button>
+            `).join("")}
+        </div>
+    `;
+}
+
+function renderTeacherActions(panel) {
+    const section = getSelectedTeacherSection();
+
+    return `
+        <div class="action-list">
+            ${panel.items.map((item) => {
+                const isLabRequest = item.title === "Solicitar aula laboratorio";
+
+                return `
+                    <button class="action-row${isLabRequest ? " lab-request-trigger" : ""}" type="button" data-action-title="${item.title}">
+                        <span><i class="fa-solid ${item.icon}" aria-hidden="true"></i></span>
+                        <div>
+                            <strong>${item.title}</strong>
+                            <small>${item.text}</small>
+                        </div>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+                `;
+            }).join("")}
+        </div>
+        ${isLabRequestOpen ? renderLabRequestForm(section) : ""}
+        ${lastLabRequest ? renderLabRequestSummary() : ""}
+    `;
+}
+
+function renderLabRequestForm(section) {
+    return `
+        <form class="lab-request-form" id="lab-request-form">
+            <div class="lab-request-heading">
+                <strong>Solicitud de laboratorio</strong>
+                <span>${section.subject} | Seccion ${section.section}</span>
+            </div>
+            <label>
+                <span>Laboratorio</span>
+                <select name="lab" required>
+                    <option value="Informatica">Informatica</option>
+                    <option value="Quimica">Quimica</option>
+                </select>
+            </label>
+            <div class="lab-request-grid">
+                <label>
+                    <span>Fecha</span>
+                    <input name="date" type="date" required>
+                </label>
+                <label>
+                    <span>Hora inicio</span>
+                    <input name="startTime" type="time" required>
+                </label>
+                <label>
+                    <span>Hora fin</span>
+                    <input name="endTime" type="time" required>
+                </label>
+            </div>
+            <label>
+                <span>Motivo</span>
+                <textarea name="reason" rows="3" placeholder="Ej. practica evaluada, demostracion, recuperacion de laboratorio" required></textarea>
+            </label>
+            <div class="lab-request-actions">
+                <button class="profile-secondary-button" type="button" data-close-lab-request>Cancelar</button>
+                <button class="profile-save-button" type="submit">
+                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                    <span>Enviar solicitud</span>
+                </button>
+            </div>
+        </form>
+    `;
+}
+
+function renderLabRequestSummary() {
+    return `
+        <article class="lab-request-summary">
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+            <div>
+                <strong>Solicitud enviada</strong>
+                <span>${lastLabRequest.lab} | ${lastLabRequest.date} | ${lastLabRequest.startTime} - ${lastLabRequest.endTime}</span>
+                <p>${lastLabRequest.subject} | Seccion ${lastLabRequest.section}</p>
+            </div>
+        </article>
+    `;
+}
+
+function renderMetricList(panel) {
+    return `
+        <div class="metric-grid">
+            ${panel.items.map((item) => `
+                <article class="metric-card">
+                    <span>${item.label}</span>
+                    <strong>${item.value}</strong>
+                </article>
+            `).join("")}
+        </div>
+    `;
+}
+
+function refreshTeacherPanels(elements) {
+    const experience = getTeacherExperience();
+
+    renderRoleHero(elements, getTeacherHero(experience));
+    renderRoleStats(elements, getTeacherStats(experience));
+    renderRolePanels(elements, experience.panels);
+    addPanelActions();
+    bindRolePanelEvents(elements);
+}
+
+function bindRolePanelEvents(elements) {
+    document.querySelectorAll(".teacher-section-card").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            selectedTeacherSectionId = event.currentTarget.dataset.sectionId;
+            refreshTeacherPanels(elements);
+        });
+    });
+
+    const attendanceDateInput = document.querySelector("#attendance-date-input");
+
+    if (attendanceDateInput) {
+        attendanceDateInput.addEventListener("change", (event) => {
+            selectedAttendanceDate = event.currentTarget.value || new Date().toISOString().slice(0, 10);
+            refreshTeacherPanels(elements);
+            document.querySelector("#attendance")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    }
+
+    document.querySelectorAll(".attendance-chip").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            const controls = event.currentTarget.closest(".attendance-controls");
+            const section = getSelectedTeacherSection();
+            const student = section.students[Number(controls.dataset.studentIndex)];
+            const status = event.currentTarget.dataset.attendanceStatus || event.currentTarget.textContent.trim();
+
+            if (student) {
+                student.attendance = status;
+                setAttendanceStatus(section.id, student, selectedAttendanceDate, status);
+            }
+
+            refreshTeacherPanels(elements);
+            document.querySelector("#attendance")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    });
+
+    document.querySelectorAll(".grade-input").forEach((input) => {
+        input.addEventListener("change", (event) => {
+            const section = getSelectedTeacherSection();
+            const student = section.students[Number(event.currentTarget.dataset.studentIndex)];
+            const gradeKey = event.currentTarget.dataset.gradeKey;
+
+            if (!student || !gradeKey) {
+                return;
+            }
+
+            student.grades[gradeKey] = event.currentTarget.value === "" ? "" : getNumericGrade(event.currentTarget.value);
+            refreshTeacherPanels(elements);
+            document.querySelector("#gradebook")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    });
+
+    document.querySelectorAll(".contact-student-button").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            const studentName = event.currentTarget.dataset.studentName;
+
+            event.currentTarget.classList.add("is-confirmed");
+            event.currentTarget.querySelector("span").textContent = `Mensaje listo para ${studentName.split(" ")[0]}`;
+            window.setTimeout(() => {
+                event.currentTarget.classList.remove("is-confirmed");
+                event.currentTarget.querySelector("span").textContent = "Contactar";
+            }, 1600);
+        });
+    });
+
+    document.querySelectorAll(".lab-request-trigger").forEach((button) => {
+        button.addEventListener("click", () => {
+            isLabRequestOpen = true;
+            refreshTeacherPanels(elements);
+            document.querySelector("#teacher-messages")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    });
+
+    document.querySelectorAll("[data-close-lab-request]").forEach((button) => {
+        button.addEventListener("click", () => {
+            isLabRequestOpen = false;
+            refreshTeacherPanels(elements);
+            document.querySelector("#teacher-messages")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    });
+
+    const labRequestForm = document.querySelector("#lab-request-form");
+
+    if (labRequestForm) {
+        labRequestForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            const section = getSelectedTeacherSection();
+            const formData = new FormData(event.currentTarget);
+
+            lastLabRequest = {
+                subject: section.subject,
+                section: section.section,
+                lab: formData.get("lab"),
+                date: formData.get("date"),
+                startTime: formData.get("startTime"),
+                endTime: formData.get("endTime"),
+                reason: formData.get("reason")
+            };
+            isLabRequestOpen = false;
+            refreshTeacherPanels(elements);
+            document.querySelector("#teacher-messages")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    }
+
+    document.querySelectorAll(".action-row").forEach((button) => {
+        button.addEventListener("click", () => {
+            if (button.classList.contains("lab-request-trigger")) {
+                return;
+            }
+
+            button.classList.add("is-confirmed");
+            window.setTimeout(() => button.classList.remove("is-confirmed"), 900);
+        });
+    });
 }
 
 let currentNewsIndex = 0;
@@ -613,6 +1360,11 @@ function exportPanel(heading) {
     const article = heading.closest('article');
     if (!article) return;
     const id = article.id;
+    const role = getCurrentRole();
+    const rolePanel = roleDashboards[role]?.panels.find((panel) => panel.id === id);
+    const teacherContextData = role === "teacher" && ["section-context", "attendance", "gradebook"].includes(id)
+        ? { panel: id, section: getSelectedTeacherSection(), gradePlan: getTeacherExperience().gradePlan }
+        : null;
     const map = {
         schedule: dashboardData.schedule,
         notifications: dashboardData.notifications,
@@ -621,7 +1373,7 @@ function exportPanel(heading) {
         news: dashboardData.news,
         pensum: dashboardData.pensum
     };
-    const data = map[id] || { message: 'No hay datos exportables para este panel.' };
+    const data = teacherContextData || rolePanel || map[id] || { message: 'No hay datos exportables para este panel.' };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -637,7 +1389,7 @@ function filterPanel(heading) {
     const query = prompt('Texto a filtrar (vacío para reset):');
     const article = heading.closest('article');
     if (!article) return;
-    const container = article.querySelector('.stack-list, .grades-list, .news-grid, .pensum-list, .schedule-grid, .stats-grid');
+    const container = article.querySelector('.stack-list, .grades-list, .news-grid, .pensum-list, .schedule-grid, .stats-grid, .role-card-grid, .attendance-list, .role-table tbody, .timeline-list, .people-list, .action-list, .metric-grid');
     if (!container) return;
     const items = Array.from(container.children);
     if (!query) {
@@ -721,13 +1473,43 @@ function bindEvents(elements) {
 
     elements.logoutButton.addEventListener("click", () => {
         localStorage.removeItem("psm_auth_token");
+        localStorage.removeItem("psm_user_role");
+        localStorage.removeItem("psm_user_name");
+        localStorage.removeItem("psm_user_document");
         window.location.href = "../index.html";
     });
 }
 
 function renderDashboard() {
     const elements = getElements();
+    const role = getCurrentRole();
 
+    document.body.dataset.role = role;
+
+    if (role !== "student") {
+        const experience = roleDashboards[role];
+
+        renderNavigation(elements, experience.nav);
+        renderRoleIdentity(elements, experience);
+        if (role === "teacher") {
+            renderRoleHero(elements, getTeacherHero(experience));
+            renderRoleStats(elements, getTeacherStats(experience));
+        } else {
+            renderRoleHero(elements, experience.hero);
+            renderRoleStats(elements, experience.stats);
+        }
+        renderRolePanels(elements, experience.panels);
+        elements.notificationCount.textContent = experience.notificationsCount;
+        elements.profileButton.hidden = role === "admin";
+        addPanelActions();
+        bindEvents(elements);
+        bindRolePanelEvents(elements);
+        return;
+    }
+
+    renderNavigation(elements, studentNavigation);
+    elements.topbarEyebrow.textContent = "Panel academico";
+    elements.profileButton.hidden = false;
     loadProfileData();
     renderStudent(elements);
     renderStats(elements);

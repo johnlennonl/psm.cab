@@ -10,6 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="../estilos/dashboard.css">
+    <script src="../Js/data/dashboardData.js" defer></script>
+    <script src="../Js/roles/studentRole.js" defer></script>
+    <script src="../Js/roles/teacherRole.js" defer></script>
+    <script src="../Js/roles/adminRole.js" defer></script>
     <script src="../Js/dashboard.js" defer></script>
 </head>
 <body class="dashboard-loading">
@@ -193,8 +197,8 @@
                         <div class="profile-photo-panel">
                             <div id="profile-avatar-preview" class="profile-avatar-preview" aria-label="Foto de perfil actual"></div>
                             <div>
-                                <strong>Cambia tu foto de perfil</strong>
-                                <p>Sube una imagen para que tu ficha academica se vea brutal.</p>
+                                <strong id="profile-photo-title">Cambia tu foto de perfil</strong>
+                                <p id="profile-photo-copy">Sube una imagen para que tu ficha academica se vea brutal.</p>
                                 <label class="profile-upload-button" for="profile-photo-input">
                                     <i class="fa-solid fa-camera" aria-hidden="true"></i>
                                     <span>Seleccionar foto</span>
@@ -205,17 +209,17 @@
 
                         <div class="profile-fields-grid">
                             <label class="profile-field" for="profile-birthdate">
-                                <span>Fecha de Nacimiento</span>
+                                <span id="profile-birthdate-label">Fecha de Nacimiento</span>
                                 <input id="profile-birthdate" type="date" name="birthdate">
                             </label>
 
                             <label class="profile-field" for="profile-document">
-                                <span>Cedula de Identidad</span>
+                                <span id="profile-document-label">Cedula de Identidad</span>
                                 <input id="profile-document" type="text" name="document" inputmode="text" placeholder="V-00000000" maxlength="12">
                             </label>
 
                             <label class="profile-field profile-field-wide" for="profile-career">
-                                <span>Carrera que esta cursando</span>
+                                <span id="profile-career-label">Carrera que esta cursando</span>
                                 <input id="profile-career" type="text" name="career" placeholder="Ingenieria de Sistemas">
                             </label>
                         </div>
