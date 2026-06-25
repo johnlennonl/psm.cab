@@ -1,0 +1,503 @@
+:root {
+    --psm-blue: #0b3a6e;
+    --psm-blue-dark: #061b33;
+    --psm-blue-soft: #e8f1fb;
+    --psm-gold: #d7af4f;
+    --ink: #061b33;
+    --muted: #5d6b82;
+    --line: #d8e1ec;
+    --surface: #ffffff;
+    --surface-soft: #f6f9fd;
+    --radius: 14px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at 8% 10%, rgba(215, 175, 79, 0.18), transparent 24%),
+        radial-gradient(circle at 92% 4%, rgba(11, 58, 110, 0.16), transparent 24%),
+        linear-gradient(135deg, #edf3fa, #ffffff 42%, #eef5fc);
+    font-family: Inter, sans-serif;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.checklist-page {
+    display: grid;
+    gap: 18px;
+    width: min(1180px, calc(100% - 28px));
+    margin: 0 auto;
+    padding: 22px 0 34px;
+}
+
+.roadmap-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.36fr);
+    gap: 18px;
+    min-height: 330px;
+    padding: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.44);
+    border-radius: 22px;
+    color: #ffffff;
+    background:
+        radial-gradient(circle at 18% 18%, rgba(215, 175, 79, 0.38), transparent 30%),
+        linear-gradient(135deg, var(--psm-blue-dark), var(--psm-blue));
+    box-shadow: 0 34px 100px rgba(6, 27, 51, 0.28);
+    overflow: hidden;
+    position: relative;
+}
+
+.roadmap-hero::after {
+    content: "";
+    position: absolute;
+    right: -70px;
+    bottom: -90px;
+    width: 300px;
+    height: 300px;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 34px rgba(255, 255, 255, 0.03);
+}
+
+.hero-copy,
+.progress-card {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-copy {
+    align-self: end;
+    max-width: 720px;
+}
+
+.hero-kicker,
+.detail-phase {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 30px;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.hero-kicker {
+    color: #ffe7a0;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.hero-copy h1 {
+    max-width: 12ch;
+    margin: 14px 0;
+    font-family: Merriweather, Georgia, serif;
+    font-size: clamp(2.4rem, 6vw, 5.2rem);
+    line-height: 0.96;
+}
+
+.hero-copy p {
+    max-width: 62ch;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 700;
+    line-height: 1.65;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.hero-actions button,
+.filter-tabs button,
+.module-card button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    border: 0;
+    border-radius: var(--radius);
+    font-weight: 900;
+}
+
+.hero-actions button {
+    padding: 10px 14px;
+    color: var(--psm-blue-dark);
+    background: #ffffff;
+}
+
+.hero-actions button:first-child {
+    color: #ffffff;
+    background: var(--psm-gold);
+}
+
+.progress-card {
+    align-self: stretch;
+    display: grid;
+    align-content: end;
+    gap: 12px;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+}
+
+.progress-card span {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.progress-card strong {
+    font-size: clamp(3rem, 7vw, 5rem);
+    line-height: 0.9;
+}
+
+.progress-track {
+    height: 12px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.progress-track span {
+    display: block;
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--psm-gold), #fff0b8);
+    transition: width 240ms ease;
+}
+
+.progress-card p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.control-panel {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid rgba(216, 225, 236, 0.86);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 18px 46px rgba(11, 58, 110, 0.08);
+}
+
+.search-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 0 14px;
+    border: 1px solid rgba(216, 225, 236, 0.95);
+    border-radius: var(--radius);
+    color: var(--psm-blue);
+    background: #ffffff;
+}
+
+.search-control input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    color: var(--ink);
+    background: transparent;
+    font-weight: 800;
+}
+
+.filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-tabs button {
+    min-height: 40px;
+    padding: 9px 12px;
+    color: var(--psm-blue);
+    background: var(--psm-blue-soft);
+}
+
+.filter-tabs button.is-active {
+    color: #ffffff;
+    background: var(--psm-blue);
+}
+
+.roadmap-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.38fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.module-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px;
+    min-height: 190px;
+    padding: 14px;
+    border: 1px solid rgba(216, 225, 236, 0.92);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 18px 46px rgba(12, 29, 54, 0.08);
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.module-card:hover,
+.module-card.is-selected {
+    border-color: rgba(11, 58, 110, 0.3);
+    box-shadow: 0 24px 58px rgba(12, 29, 54, 0.12);
+    transform: translateY(-2px);
+}
+
+.module-card.is-done {
+    background: linear-gradient(135deg, #ffffff, #f2fff7);
+}
+
+.module-icon {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    color: var(--psm-blue);
+    background: var(--psm-blue-soft);
+    font-size: 1.1rem;
+}
+
+.module-content {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+}
+
+.module-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.module-meta span {
+    display: inline-flex;
+    min-height: 24px;
+    align-items: center;
+    padding: 5px 8px;
+    border-radius: 99px;
+    color: var(--psm-blue-dark);
+    background: var(--psm-blue-soft);
+    font-size: 0.68rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.module-content h3 {
+    margin: 0;
+    color: var(--psm-blue-dark);
+    font-size: 1.04rem;
+    line-height: 1.2;
+}
+
+.module-content p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.module-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-self: end;
+}
+
+.module-card button {
+    min-height: 36px;
+    padding: 8px 10px;
+    color: var(--psm-blue);
+    background: var(--psm-blue-soft);
+    font-size: 0.78rem;
+}
+
+.module-card button[data-action="toggle"] {
+    color: #ffffff;
+    background: var(--psm-blue);
+}
+
+.module-card.is-done button[data-action="toggle"] {
+    background: #067647;
+}
+
+.detail-panel {
+    position: sticky;
+    top: 16px;
+    display: grid;
+    gap: 14px;
+    min-height: 620px;
+    padding: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 22px;
+    color: #ffffff;
+    background:
+        radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 96% 92%, rgba(215, 175, 79, 0.2), transparent 30%),
+        linear-gradient(145deg, var(--psm-blue-dark), var(--psm-blue));
+    box-shadow: 0 30px 80px rgba(6, 27, 51, 0.26);
+    overflow: hidden;
+}
+
+.detail-panel::after {
+    content: "";
+    position: absolute;
+    right: -64px;
+    bottom: -70px;
+    width: 240px;
+    height: 240px;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 26px rgba(255, 255, 255, 0.03);
+}
+
+.detail-stamp {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border: 2px dashed rgba(255, 255, 255, 0.28);
+    border-radius: 50%;
+    color: #ffe7a0;
+    font-size: 0.64rem;
+    font-weight: 1000;
+    transform: rotate(-12deg);
+}
+
+.detail-phase {
+    color: #ffe7a0;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.detail-panel h2 {
+    max-width: 12ch;
+    margin: 0;
+    font-family: Merriweather, Georgia, serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 1;
+}
+
+.detail-panel p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 700;
+    line-height: 1.65;
+}
+
+.detail-features {
+    display: grid;
+    gap: 9px;
+}
+
+.detail-features span,
+.detail-footer span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    padding: 8px 10px;
+    border-radius: 99px;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+.detail-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    padding: 22px;
+    border: 1px dashed rgba(11, 58, 110, 0.24);
+    border-radius: 18px;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.72);
+    font-weight: 800;
+    text-align: center;
+}
+
+@media (max-width: 940px) {
+    .roadmap-hero,
+    .roadmap-shell,
+    .control-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-panel {
+        position: relative;
+        top: auto;
+        min-height: 420px;
+    }
+}
+
+@media (max-width: 680px) {
+    .module-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .roadmap-hero {
+        padding: 18px;
+    }
+
+    .hero-copy h1 {
+        max-width: 100%;
+    }
+
+    .filter-tabs,
+    .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .filter-tabs button,
+    .hero-actions button {
+        width: 100%;
+    }
+}

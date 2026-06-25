@@ -3,7 +3,7 @@
 window.PSM_ROLES = window.PSM_ROLES || {};
 window.PSM_ROLES.teacher = {
         identity: {
-            name: "Prof. Laura Salazar",
+            name: "Profesora. Laura Salazar",
             subtitle: "Docente | Ingenieria de Sistemas",
             initials: "LS"
         },

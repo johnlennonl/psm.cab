@@ -45,12 +45,12 @@ window.PSM_DASHBOARD_DATA = {
     ],
     messages: [
         { title: "Coordinacion academica", text: "Recuerda validar tu carga academica antes del viernes.", time: "09:20 AM", icon: "fa-building-columns" },
-        { title: "Prof. Salazar", text: "Subi material de practica para el laboratorio de Programacion II.", time: "Ayer", icon: "fa-user-tie" },
+        { title: "Profesora. Laura Salazar", text: "Subi material de practica para el laboratorio de Programacion II.", time: "Ayer", icon: "fa-user-tie" },
         { title: "Control de estudios", text: "Disponible constancia de estudios digital.", time: "Lunes", icon: "fa-file-lines" }
     ],
     news: [
-        { title: "Jornada de investigacion estudiantil", text: "Participa con tus proyectos academicos y prototipos tecnologicos.", date: "18 Jun 2026", image: "../img/WhatsApp Image 2026-06-18 at 10.26.34 AM (1).jpeg" },
-        { title: "Inscripciones intensivo", text: "Consulta materias disponibles para el periodo academico especial.", date: "20 Jun 2026", image: "../img/WhatsApp Image 2026-06-18 at 10.26.34 AM.jpeg" },
+        { title: "Jornada de investigacion estudiantil", text: "Participa con tus proyectos academicos y prototipos tecnologicos.", date: "11 Jun 2026", image: "../img/WhatsApp Image 2026-06-18 at 10.26.34 AM (1).jpeg" },
+        { title: "Mundial PSM", text: "Vive la Alegria del mundial en PSM Cabimas", date: "20 Jun 2026", image: "../img/WhatsApp Image 2026-06-18 at 10.26.34 AM.jpeg" },
         { title: "Feria de empleabilidad", text: "Empresas aliadas visitaran el campus para entrevistas y charlas.", date: "25 Jun 2026", image: "../img/WhatsApp Image 2026-06-18 at 10.27.44 AM.jpeg" }
     ],
     pensum: [

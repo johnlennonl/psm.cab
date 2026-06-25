@@ -2,7 +2,7 @@
 
 const VALID_IDENTITIES = [
     { documentType: "V", documentNumber: "24485562", role: "student", name: "John Lennon" },
-    { documentType: "V", documentNumber: "11111111", role: "teacher", name: "Prof. Laura Salazar" },
+    { documentType: "V", documentNumber: "11111111", role: "teacher", name: "Profesora. Laura Salazar" },
     { documentType: "V", documentNumber: "99999999", role: "admin", name: "Admin PSM" },
     { documentType: "E", documentNumber: "87654321", role: "student", name: "Estudiante Invitado" }
 ];

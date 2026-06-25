@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Checklist visual de modulos propuestos para el portal academico estudiante PSM.">
+    <title>Checklist Plataforma Estudiante | PSM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="estilos/checklist.css">
+    <script src="Js/checklist.js" defer></script>
+</head>
+<body>
+    <main class="checklist-page">
+        <section class="roadmap-hero" aria-labelledby="roadmap-title">
+            <div class="hero-copy">
+                <span class="hero-kicker">Plan maestro estudiante</span>
+                <h1 id="roadmap-title">Checklist de evolucion del portal PSM</h1>
+                <p>Una vista separada para decidir que vamos a construir, por que sirve y como se conectara luego con Supabase.</p>
+                <div class="hero-actions" aria-label="Acciones del checklist">
+                    <button id="mark-priority" type="button"><i class="fa-solid fa-bolt" aria-hidden="true"></i>Marcar prioridad alta</button>
+                    <button id="reset-progress" type="button"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i>Reiniciar avance</button>
+                </div>
+            </div>
+
+            <aside class="progress-card" aria-label="Resumen de avance">
+                <span>Avance del roadmap</span>
+                <strong id="progress-percent">0%</strong>
+                <div class="progress-track" aria-hidden="true"><span id="progress-bar"></span></div>
+                <p id="progress-copy">Selecciona pasos completados para visualizar progreso.</p>
+            </aside>
+        </section>
+
+        <section class="control-panel" aria-label="Controles de exploracion">
+            <label class="search-control" for="module-search">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input id="module-search" type="search" placeholder="Buscar modulo, funcion o fase">
+            </label>
+
+            <div class="filter-tabs" role="tablist" aria-label="Filtros de prioridad">
+                <button class="is-active" type="button" data-filter="all">Todos</button>
+                <button type="button" data-filter="alta">Alta</button>
+                <button type="button" data-filter="media">Media</button>
+                <button type="button" data-filter="visual">Visual</button>
+            </div>
+        </section>
+
+        <section class="roadmap-shell" aria-label="Checklist propuesto">
+            <div id="module-grid" class="module-grid"></div>
+
+            <aside class="detail-panel" aria-live="polite">
+                <div class="detail-stamp">PSM</div>
+                <span id="detail-phase" class="detail-phase">Fase inicial</span>
+                <h2 id="detail-title">Selecciona un modulo</h2>
+                <p id="detail-description">Aqui veras el objetivo, funcionalidades y razon de prioridad de cada paso.</p>
+                <div id="detail-features" class="detail-features"></div>
+                <div class="detail-footer">
+                    <span id="detail-impact"><i class="fa-solid fa-signal" aria-hidden="true"></i>Impacto</span>
+                    <span id="detail-supabase"><i class="fa-solid fa-database" aria-hidden="true"></i>Supabase ready</span>
+                </div>
+            </aside>
+        </section>
+    </main>
+</body>
+</html>

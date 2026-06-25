@@ -11,6 +11,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="../estilos/dashboard.css">
     <script src="../Js/data/dashboardData.js" defer></script>
+    <script src="../Js/student/estudiantePensum.js" defer></script>
+    <script src="../Js/student/estudianteNoticias.js" defer></script>
+    <script src="../Js/student/estudianteNotas.js" defer></script>
+    <script src="../Js/student/estudiantesMensajes.js" defer></script>
+    <script src="../Js/student/estudianteSolicitudes.js" defer></script>
+    <script src="../Js/student/estudianteHorarioAcademico.js" defer></script>
+    <script src="../Js/student/estudianteNotificaciones.js" defer></script>
+    <script src="../Js/teacher/profesorSecciones.js" defer></script>
+    <script src="../Js/teacher/profesorContexto.js" defer></script>
+    <script src="../Js/teacher/profesorAsistencia.js" defer></script>
+    <script src="../Js/teacher/profesorNotas.js" defer></script>
+    <script src="../Js/teacher/profesorPlanificacion.js" defer></script>
+    <script src="../Js/teacher/profesorRiesgo.js" defer></script>
+    <script src="../Js/teacher/profesorAcciones.js" defer></script>
+    <script src="../Js/admin/adminUsuarios.js" defer></script>
+    <script src="../Js/admin/adminAcademico.js" defer></script>
+    <script src="../Js/admin/adminSolicitudes.js" defer></script>
+    <script src="../Js/admin/adminMetricas.js" defer></script>
+    <script src="../Js/admin/adminNoticias.js" defer></script>
+    <script src="../Js/admin/adminAuditoria.js" defer></script>
     <script src="../Js/roles/studentRole.js" defer></script>
     <script src="../Js/roles/teacherRole.js" defer></script>
     <script src="../Js/roles/adminRole.js" defer></script>
@@ -50,8 +70,14 @@
                 <a class="nav-link" href="#grades"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Notas</span></a>
                 <a class="nav-link" href="#messages"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
                 <a class="nav-link" href="#notifications"><i class="fa-solid fa-bell" aria-hidden="true"></i><span>Notificaciones</span></a>
+                <a class="nav-link" href="#pensum"><i class="fa-solid fa-diagram-project" aria-hidden="true"></i><span>Pensum</span></a>
                 <a class="nav-link" href="#news"><i class="fa-solid fa-newspaper" aria-hidden="true"></i><span>Noticias</span></a>
             </nav>
+
+            <div id="career-watermark" class="sidebar-watermark" aria-hidden="true">
+                <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+                <span>Carrera</span>
+            </div>
 
             <button id="logout-button" class="logout-button" type="button">
                 <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
@@ -74,19 +100,42 @@
 
                 <form class="search-box" role="search">
                     <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                    <input type="search" placeholder="Buscar materias, noticias o mensajes" aria-label="Buscar en el portal">
+                    <input id="dashboard-search-input" type="search" placeholder="Buscar materias, noticias o mensajes" aria-label="Buscar en el portal">
                 </form>
 
                 <div class="topbar-actions" aria-label="Acciones de usuario">
+                    <button id="requests-button" class="topbar-action requests-action" type="button" aria-label="Abrir solicitudes" title="Solicitudes" aria-haspopup="dialog">
+                        <i class="fa-solid fa-file-signature" aria-hidden="true"></i>
+                        <strong class="visually-hidden">Solicitudes</strong>
+                    </button>
                     <a class="topbar-action notification-button" href="#notifications" aria-label="Ver notificaciones" title="Notificaciones">
                         <i class="fa-solid fa-bell" aria-hidden="true"></i>
                         <span id="notification-count">3</span>
+                        <strong class="visually-hidden">Notificaciones</strong>
                     </a>
-                    <button id="settings-button" class="topbar-action" type="button" aria-label="Abrir configuracion" title="Configuracion">
-                        <i class="fa-solid fa-gear" aria-hidden="true"></i>
-                    </button>
+                    <div class="settings-control">
+                        <button id="settings-button" class="topbar-action" type="button" aria-label="Abrir configuracion" title="Configuracion" aria-haspopup="dialog">
+                            <i class="fa-solid fa-gear" aria-hidden="true"></i>
+                            <strong class="visually-hidden">Configuracion</strong>
+                        </button>
+                        <div id="settings-quick-menu" class="settings-quick-menu" role="menu" aria-label="Accesos rapidos de configuracion">
+                            <button type="button" role="menuitem" data-settings-open>
+                                <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                                <span>Preferencias</span>
+                            </button>
+                            <button type="button" role="menuitem" data-settings-focus="appearance">
+                                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+                                <span>Apariencia</span>
+                            </button>
+                            <button type="button" role="menuitem" data-settings-focus="reminders">
+                                <i class="fa-solid fa-bell" aria-hidden="true"></i>
+                                <span>Recordatorios</span>
+                            </button>
+                        </div>
+                    </div>
                     <button id="profile-button" class="topbar-action profile-action" type="button" aria-label="Ver mi perfil" title="Mi Perfil">
                         <i class="fa-solid fa-user" aria-hidden="true"></i>
+                        <strong class="visually-hidden">Mi perfil</strong>
                     </button>
                 </div>
             </header>
@@ -170,6 +219,23 @@
             </section>
         </main>
 
+        <section id="requests-modal" class="student-requests-modal" aria-hidden="true" hidden>
+            <div class="student-requests-modal-backdrop" data-requests-close></div>
+            <article class="student-requests-card" role="dialog" aria-modal="true" aria-labelledby="requests-modal-title">
+                <button id="requests-close-button" class="student-requests-close-button" type="button" aria-label="Cerrar solicitudes" data-requests-close>
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+
+                <header class="student-requests-modal-heading">
+                    <span>Control de estudios</span>
+                    <h2 id="requests-modal-title">Solicitudes estudiantiles</h2>
+                    <p>Gestiona constancias, cambios, retiros y justificativos sin cambiar de pantalla.</p>
+                </header>
+
+                <div id="requests-list" class="student-requests-list"></div>
+            </article>
+        </section>
+
         <section id="profile-modal" class="profile-modal" aria-hidden="true" hidden>
             <div class="profile-modal-backdrop" data-profile-close></div>
             <article class="profile-card" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
@@ -233,6 +299,80 @@
                         </div>
                     </form>
                 </div>
+            </article>
+        </section>
+
+        <section id="settings-modal" class="settings-modal" aria-hidden="true" hidden>
+            <div class="settings-modal-backdrop" data-settings-close></div>
+            <article class="settings-card" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+                <button id="settings-close-button" class="settings-close-button" type="button" aria-label="Cerrar configuracion" data-settings-close>
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+
+                <header class="settings-hero">
+                    <span>Centro de control</span>
+                    <h2 id="settings-modal-title">Configuracion del portal</h2>
+                    <p>Ajusta como se siente el dashboard y como quieres recibir tus recordatorios.</p>
+                </header>
+
+                <form id="settings-form" class="settings-form">
+                    <section class="settings-panel" data-settings-section="appearance">
+                        <div class="settings-panel-heading">
+                            <i class="fa-solid fa-palette" aria-hidden="true"></i>
+                            <div>
+                                <span>Apariencia</span>
+                                <strong>Control visual</strong>
+                            </div>
+                        </div>
+
+                        <label class="settings-toggle" for="setting-compact-mode">
+                            <span>
+                                <strong>Modo compacto</strong>
+                                <small>Reduce espacios para ver mas informacion.</small>
+                            </span>
+                            <input id="setting-compact-mode" type="checkbox" name="compactMode">
+                        </label>
+
+                        <label class="settings-toggle" for="setting-reduced-motion">
+                            <span>
+                                <strong>Reducir animaciones</strong>
+                                <small>Suaviza movimientos y efectos automaticos.</small>
+                            </span>
+                            <input id="setting-reduced-motion" type="checkbox" name="reducedMotion">
+                        </label>
+                    </section>
+
+                    <section class="settings-panel" data-settings-section="reminders">
+                        <div class="settings-panel-heading">
+                            <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                            <div>
+                                <span>Recordatorios</span>
+                                <strong>Alertas academicas</strong>
+                            </div>
+                        </div>
+
+                        <label class="settings-toggle" for="setting-reminder-alerts">
+                            <span>
+                                <strong>Alertas al iniciar sesion</strong>
+                                <small>Muestra avisos del dia solo cuando entras al portal.</small>
+                            </span>
+                            <input id="setting-reminder-alerts" type="checkbox" name="reminderAlerts">
+                        </label>
+
+                        <button id="settings-clear-expired" class="settings-clean-button" type="button">
+                            <i class="fa-solid fa-broom" aria-hidden="true"></i>
+                            <span>Limpiar recordatorios vencidos</span>
+                        </button>
+                    </section>
+
+                    <div class="settings-actions-row">
+                        <button id="settings-reset-button" class="settings-secondary-button" type="button">Restablecer</button>
+                        <button class="settings-save-button" type="submit">
+                            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                            <span>Guardar cambios</span>
+                        </button>
+                    </div>
+                </form>
             </article>
         </section>
         

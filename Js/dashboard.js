@@ -4,12 +4,36 @@ const DASHBOARD_LOADER_DELAY_MS = 1400;
 const PROFILE_STORAGE_KEY = "psm_profile_data";
 const ROLE_STORAGE_KEY = "psm_user_role";
 const ATTENDANCE_STORAGE_KEY = "psm_teacher_attendance_records";
+const TEACHER_GRADES_STORAGE_KEY = "psm_teacher_grade_records";
+const SETTINGS_STORAGE_KEY = "psm_dashboard_settings";
 
 const dashboardData = window.PSM_DASHBOARD_DATA || {};
 const weekDays = window.PSM_WEEK_DAYS || [];
 
 const studentNavigation = window.PSM_STUDENT_NAVIGATION || [];
+const studentModules = window.PSM_STUDENT_MODULES || {};
+const teacherModules = window.PSM_TEACHER_MODULES || {};
+const adminModules = window.PSM_ADMIN_MODULES || {};
 const roleDashboards = window.PSM_ROLES || {};
+
+const CAREER_WATERMARKS = [
+    { match: "sistemas", icon: "fa-laptop-code", label: "Sistemas" },
+    { match: "civil", icon: "fa-helmet-safety", label: "Civil" },
+    { match: "arquitectura", icon: "fa-drafting-compass", label: "Arquitectura" },
+    { match: "industrial", icon: "fa-industry", label: "Industrial" },
+    { match: "electrica", icon: "fa-bolt", label: "Electrica" },
+    { match: "electronica", icon: "fa-microchip", label: "Electronica" },
+    { match: "mantenimiento", icon: "fa-gears", label: "Mantenimiento" },
+    { match: "diseno", icon: "fa-pen-nib", label: "Diseno" },
+    { match: "quimica", icon: "fa-flask", label: "Quimica" },
+    { match: "petroleo", icon: "fa-oil-well", label: "Petroleo" }
+];
+
+const DEFAULT_SETTINGS = {
+    compactMode: false,
+    reducedMotion: false,
+    reminderAlerts: true
+};
 
 let selectedTeacherSectionId = roleDashboards.teacher?.selectedSectionId || "prog-ii-a";
 let isLabRequestOpen = false;
@@ -131,6 +155,90 @@ function setAttendanceStatus(sectionId, student, date, status) {
     saveAttendanceRecords(records);
 }
 
+function loadTeacherGradeRecords() {
+    const savedRecords = localStorage.getItem(TEACHER_GRADES_STORAGE_KEY);
+
+    if (!savedRecords) {
+        return {};
+    }
+
+    try {
+        return JSON.parse(savedRecords);
+    } catch (error) {
+        localStorage.removeItem(TEACHER_GRADES_STORAGE_KEY);
+        return {};
+    }
+}
+
+function saveTeacherGradeRecords(records) {
+    localStorage.setItem(TEACHER_GRADES_STORAGE_KEY, JSON.stringify(records));
+}
+
+function applySavedTeacherGrades() {
+    const experience = getTeacherExperience();
+    const records = loadTeacherGradeRecords();
+
+    if (!experience || !experience.sections) {
+        return;
+    }
+
+    experience.sections.forEach((section) => {
+        const sectionGrades = records[section.id];
+
+        if (!sectionGrades) {
+            return;
+        }
+
+        section.students.forEach((student) => {
+            if (sectionGrades[student.document]) {
+                student.grades = {
+                    ...student.grades,
+                    ...sectionGrades[student.document]
+                };
+            }
+        });
+    });
+}
+
+function saveCurrentSectionGrades(section) {
+    const records = loadTeacherGradeRecords();
+
+    records[section.id] = section.students.reduce((sectionGrades, student) => {
+        return {
+            ...sectionGrades,
+            [student.document]: student.grades
+        };
+    }, {});
+
+    saveTeacherGradeRecords(records);
+}
+
+function saveCurrentAttendance(section, date) {
+    section.students.forEach((student) => {
+        setAttendanceStatus(section.id, student, date, getAttendanceStatus(section.id, student, date));
+    });
+}
+
+function confirmPanelSubmit(button, confirmedText) {
+    const label = button.querySelector("span");
+    const originalText = label ? label.textContent : button.textContent;
+
+    button.classList.add("is-confirmed");
+    if (label) {
+        label.textContent = confirmedText;
+    } else {
+        button.textContent = confirmedText;
+    }
+    window.setTimeout(() => {
+        button.classList.remove("is-confirmed");
+        if (label) {
+            label.textContent = originalText;
+        } else {
+            button.textContent = originalText;
+        }
+    }, 1400);
+}
+
 function getElements() {
     return {
         sidebar: document.querySelector("#sidebar"),
@@ -146,7 +254,12 @@ function getElements() {
         gradesList: document.querySelector("#grades-list"),
         notificationsList: document.querySelector("#notifications-list"),
         messagesList: document.querySelector("#messages-list"),
+        requestsList: document.querySelector("#requests-list"),
+        requestsButton: document.querySelector("#requests-button"),
+        requestsModal: document.querySelector("#requests-modal"),
+        requestsCloseButton: document.querySelector("#requests-close-button"),
         newsList: document.querySelector("#news-list"),
+        searchInput: document.querySelector("#dashboard-search-input"),
         notificationCount: document.querySelector("#notification-count"),
         nextClassTitle: document.querySelector("#next-class-title"),
         nextClassDetail: document.querySelector("#next-class-detail"),
@@ -155,6 +268,17 @@ function getElements() {
         contentGrid: document.querySelector(".content-grid"),
         topbarEyebrow: document.querySelector(".topbar-title p"),
         heroPanel: document.querySelector("#overview"),
+        settingsControl: document.querySelector(".settings-control"),
+        settingsButton: document.querySelector("#settings-button"),
+        settingsQuickMenu: document.querySelector("#settings-quick-menu"),
+        settingsModal: document.querySelector("#settings-modal"),
+        settingsCloseButton: document.querySelector("#settings-close-button"),
+        settingsForm: document.querySelector("#settings-form"),
+        settingsCompactMode: document.querySelector("#setting-compact-mode"),
+        settingsReducedMotion: document.querySelector("#setting-reduced-motion"),
+        settingsReminderAlerts: document.querySelector("#setting-reminder-alerts"),
+        settingsResetButton: document.querySelector("#settings-reset-button"),
+        settingsClearExpired: document.querySelector("#settings-clear-expired"),
         profileButton: document.querySelector("#profile-button"),
         profileModal: document.querySelector("#profile-modal"),
         profileModalTitle: document.querySelector("#profile-modal-title"),
@@ -173,76 +297,93 @@ function getElements() {
     };
 }
 
-function renderPensum(elements) {
-    if (!dashboardData.pensum || !dashboardData.pensum.length) {
-        elements.pensumList.innerHTML = '<p class="muted">Pensum no disponible. Puedes importar o editar los datos.</p>';
+function loadSettings() {
+    try {
+        return {
+            ...DEFAULT_SETTINGS,
+            ...JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY) || "{}")
+        };
+    } catch (error) {
+        localStorage.removeItem(SETTINGS_STORAGE_KEY);
+        return { ...DEFAULT_SETTINGS };
+    }
+}
+
+function saveSettings(settings) {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+}
+
+function applySettings(settings = loadSettings()) {
+    document.body.classList.toggle("pref-compact", settings.compactMode);
+    document.body.classList.toggle("pref-reduced-motion", settings.reducedMotion);
+}
+
+function syncSettingsForm(elements) {
+    const settings = loadSettings();
+
+    elements.settingsCompactMode.checked = settings.compactMode;
+    elements.settingsReducedMotion.checked = settings.reducedMotion;
+    elements.settingsReminderAlerts.checked = settings.reminderAlerts;
+}
+
+function openSettingsModal(elements, focusSection = null) {
+    elements.settingsControl.classList.add("is-menu-dismissed");
+    syncSettingsForm(elements);
+    elements.settingsModal.hidden = false;
+    elements.settingsModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("settings-modal-open");
+
+    if (focusSection) {
+        elements.settingsModal.querySelector(`[data-settings-section="${focusSection}"]`)?.scrollIntoView({ block: "center" });
+    }
+
+    elements.settingsCloseButton.focus();
+}
+
+function closeSettingsModal(elements) {
+    elements.settingsModal.hidden = true;
+    elements.settingsModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("settings-modal-open");
+    elements.settingsControl.classList.add("is-menu-dismissed");
+    elements.settingsButton.blur();
+}
+
+function openRequestsModal(elements) {
+    studentModules.solicitudes?.render(elements, dashboardData);
+    elements.requestsModal.hidden = false;
+    elements.requestsModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("requests-modal-open");
+    elements.requestsCloseButton.focus();
+}
+
+function closeRequestsModal(elements, force = false) {
+    const closeModal = () => {
+        elements.requestsModal.hidden = true;
+        elements.requestsModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("requests-modal-open");
+        elements.requestsButton.blur();
+    };
+
+    if (!force && studentModules.solicitudes?.handleCloseRequest) {
+        studentModules.solicitudes.handleCloseRequest(elements, closeModal);
         return;
     }
 
-    elements.pensumList.innerHTML = dashboardData.pensum.map((sem, sidx) => {
-        const rows = sem.subjects.map((sub) => {
-            const gradeMatch = dashboardData.grades.find((grade) => sub.name.toLowerCase().includes(grade.subject.toLowerCase()));
-            const statusClass = gradeMatch && gradeMatch.score >= 16 ? ' pensum-approved' : ` pensum-${sem.status}`;
-            const scoreBadge = gradeMatch ? `<span class="pensum-score">${gradeMatch.score}/20</span>` : '';
-
-            return `
-                <div class="pensum-row${statusClass}">
-                    <div class="pensum-code">${sub.code}</div>
-                    <div class="pensum-name">${sub.name}</div>
-                    <div>${sub.ht}</div>
-                    <div>${sub.hp}</div>
-                    <div>${sub.hl}</div>
-                    <div>${sub.th}</div>
-                    <div class="pensum-uc">${sub.uc} ${scoreBadge}</div>
-                    <div class="pensum-pre">${sub.pre}</div>
-                </div>
-            `;
-        }).join('');
-
-        const statusLabel = {
-            approved: "Aprobado",
-            active: "En curso",
-            pending: "Pendiente"
-        }[sem.status] || "Pendiente";
-
-        const isOpen = sem.status === "active";
-
-        return `
-            <section class="pensum-semester pensum-semester-${sem.status}" data-semester-index="${sidx}">
-                <button type="button" class="pensum-toggle" aria-expanded="${isOpen}">
-                    <span>${sem.semester}</span>
-                    <strong>${statusLabel}</strong>
-                </button>
-                <div class="pensum-table" ${isOpen ? "" : "hidden"}>
-                    <div class="pensum-row pensum-header">
-                        <div class="pensum-code">COD</div>
-                        <div class="pensum-name">ASIGNATURA</div>
-                        <div>HT</div>
-                        <div>HP</div>
-                        <div>HL</div>
-                        <div>TH</div>
-                        <div class="pensum-uc">UC</div>
-                        <div class="pensum-pre">PRELACION</div>
-                    </div>
-                    ${rows}
-                </div>
-            </section>
-        `;
-    }).join('');
-
-    // bind toggles
-    elements.pensumList.querySelectorAll('.pensum-toggle').forEach((btn) => {
-        btn.addEventListener('click', (e) => {
-            const parent = e.currentTarget.closest('.pensum-semester');
-            const table = parent.querySelector('.pensum-table');
-            const isHidden = table.hasAttribute('hidden');
-            e.currentTarget.setAttribute('aria-expanded', String(isHidden));
-            if (isHidden) table.removeAttribute('hidden'); else table.setAttribute('hidden', '');
-        });
-    });
+    closeModal();
 }
 
-let currentLightboxIndex = null;
+function handleSettingsSubmit(event, elements) {
+    event.preventDefault();
+    const settings = {
+        compactMode: elements.settingsCompactMode.checked,
+        reducedMotion: elements.settingsReducedMotion.checked,
+        reminderAlerts: elements.settingsReminderAlerts.checked
+    };
+
+    saveSettings(settings);
+    applySettings(settings);
+    confirmPanelSubmit(event.submitter || elements.settingsForm.querySelector(".settings-save-button"), "Guardado");
+}
 
 function guardSession() {
     const token = localStorage.getItem("psm_auth_token");
@@ -313,12 +454,36 @@ function renderAvatar(container, student) {
     container.textContent = initials;
 }
 
+function normalizeText(value) {
+    return value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+}
+
+function renderCareerWatermark(career) {
+    const watermark = document.querySelector("#career-watermark");
+
+    if (!watermark) {
+        return;
+    }
+
+    const normalizedCareer = normalizeText(career || "");
+    const careerWatermark = CAREER_WATERMARKS.find((item) => normalizedCareer.includes(item.match)) || {
+        icon: "fa-graduation-cap",
+        label: "Carrera"
+    };
+
+    watermark.innerHTML = `<i class="fa-solid ${careerWatermark.icon}" aria-hidden="true"></i><span>${careerWatermark.label}</span>`;
+}
+
 function renderStudent(elements) {
     const firstName = dashboardData.student.name.split(" ")[0];
 
     elements.welcomeName.textContent = firstName;
     elements.studentName.textContent = dashboardData.student.name;
     elements.studentCareer.textContent = `${dashboardData.student.career} - ${dashboardData.student.semester}`;
+    renderCareerWatermark(dashboardData.student.career);
     renderAvatar(elements.studentAvatar, dashboardData.student);
 }
 
@@ -467,73 +632,6 @@ function renderStats(elements) {
     }).join("");
 }
 
-function renderSchedule(elements) {
-    elements.scheduleGrid.innerHTML = weekDays.map((day) => {
-        const classes = dashboardData.schedule.filter((item) => item.day === day);
-        const classCards = classes.length
-            ? classes.map((item) => createClassCard(item)).join("")
-            : '<span class="empty-day">Sin clases asignadas</span>';
-
-        return `
-            <section class="day-column" aria-label="${day}">
-                <h3>${day}</h3>
-                ${classCards}
-            </section>
-        `;
-    }).join("");
-}
-
-function createClassCard(classItem) {
-    return `
-        <article class="class-card" style="--accent: ${classItem.accent}">
-            <strong>${classItem.subject}</strong>
-            <p>${classItem.time} | ${classItem.room}</p>
-            <p>${classItem.teacher} | ${classItem.mode}</p>
-        </article>
-    `;
-}
-
-function renderNextClass(elements) {
-    const nextClass = dashboardData.schedule[0];
-
-    elements.nextClassTitle.textContent = nextClass.subject;
-    elements.nextClassDetail.textContent = `${nextClass.day}, ${nextClass.time} | ${nextClass.room}`;
-}
-
-function renderGrades(elements) {
-    elements.gradesList.innerHTML = dashboardData.grades.map((grade) => {
-        const progress = Math.min(100, Math.max(0, grade.score * 5));
-
-        return `
-            <article class="grade-item">
-                <div class="grade-header">
-                    <strong>${grade.subject}</strong>
-                    <span class="grade-score">${grade.score}/20</span>
-                </div>
-                <div class="progress-bar" aria-label="Progreso de nota ${grade.score} sobre 20">
-                    <span style="--value: ${progress}%"></span>
-                </div>
-                <p>${grade.status}</p>
-            </article>
-        `;
-    }).join("");
-}
-
-function renderStackList(container, items) {
-    container.innerHTML = items.map((item) => {
-        return `
-            <article class="stack-item">
-                <span class="stack-icon"><i class="fa-solid ${item.icon}" aria-hidden="true"></i></span>
-                <div>
-                    <strong>${item.title}</strong>
-                    <p>${item.text}</p>
-                    <span class="stack-meta">${item.time}</span>
-                </div>
-            </article>
-        `;
-    }).join("");
-}
-
 function getCurrentRole() {
     const role = localStorage.getItem(ROLE_STORAGE_KEY) || "student";
     return roleDashboards[role] ? role : "student";
@@ -541,6 +639,10 @@ function getCurrentRole() {
 
 function getSessionName(fallbackName) {
     return localStorage.getItem("psm_user_name") || fallbackName;
+}
+
+function getTeacherDisplayName(name) {
+    return name.replace(/^(profesora|profesor|profa|prof)\.?\s*/i, "").trim() || name;
 }
 
 function renderNavigation(elements, navItems) {
@@ -554,18 +656,34 @@ function renderNavigation(elements, navItems) {
     }).join("");
 }
 
+function syncTopbarSearch(elements, role) {
+    if (!elements.searchInput) {
+        return;
+    }
+
+    const placeholders = {
+           student: "Buscar materias, solicitudes, noticias o mensajes",
+        teacher: "Buscar secciones, estudiantes, asistencia o notas",
+        admin: "Buscar usuarios, solicitudes, noticias o auditoria"
+    };
+
+    elements.searchInput.placeholder = placeholders[role] || placeholders.student;
+}
+
 function renderRoleIdentity(elements, experience) {
     const name = getSessionName(experience.identity.name);
-    const firstName = name.split(" ")[0];
+    const isTeacher = getCurrentRole() === "teacher";
+    const cleanName = isTeacher ? getTeacherDisplayName(name) : name;
+    const displayName = isTeacher ? cleanName : cleanName.split(" ")[0];
     const savedProfile = loadSavedProfile();
 
-    elements.welcomeName.textContent = firstName;
-    elements.studentName.textContent = name;
-    elements.studentCareer.textContent = getCurrentRole() === "teacher" && savedProfile.career
+    elements.welcomeName.textContent = displayName;
+    elements.studentName.textContent = cleanName;
+    elements.studentCareer.textContent = isTeacher && savedProfile.career
         ? `Docente | ${savedProfile.career}`
         : experience.identity.subtitle;
     renderAvatar(elements.studentAvatar, {
-        name,
+        name: cleanName,
         photo: savedProfile.photo || ""
     });
     elements.topbarEyebrow.textContent = experience.topbarLabel;
@@ -609,6 +727,35 @@ function renderRoleStats(elements, stats) {
             </article>
         `;
     }).join("");
+}
+
+function getTeacherModuleContext(panel = null) {
+    const experience = getTeacherExperience();
+    const section = getSelectedTeacherSection();
+
+    return {
+        panel,
+        experience,
+        section,
+        selectedTeacherSectionId,
+        selectedAttendanceDate,
+        isLabRequestOpen,
+        lastLabRequest,
+        getAttendanceStatus,
+        countPendingGrades,
+        getTeacherRiskStudents,
+        renderStudentIdentity,
+        formatGrade,
+        calculateCutScore,
+        calculateWeightedFinal
+    };
+}
+
+function getAdminModuleContext(panel = null) {
+    return {
+        panel,
+        experience: roleDashboards.admin
+    };
 }
 
 function countPendingGrades(section) {
@@ -658,7 +805,7 @@ function renderRolePanels(elements, panels) {
     elements.contentGrid.innerHTML = panels.map((panel) => {
         return `
             <article id="${panel.id}" class="panel role-panel role-panel-${panel.type}">
-                <div class="section-heading">
+                <div class="section-heading ">
                     <div>
                         <p>${panel.kicker}</p>
                         <h2>${panel.title}</h2>
@@ -679,79 +826,21 @@ function renderRolePanelContent(panel) {
         people: renderPeopleList,
         actions: renderActionList,
         metrics: renderMetricList,
-        teacherSections: renderTeacherSections,
-        teacherContext: renderTeacherContext,
-        teacherAttendance: renderTeacherAttendance,
-        teacherGradebook: renderTeacherGradebook,
-        teacherPlanning: renderTeacherPlanning,
-        teacherRisk: renderTeacherRisk
+        teacherSections: (currentPanel) => teacherModules.secciones?.render(getTeacherModuleContext(currentPanel)) || "",
+        teacherContext: (currentPanel) => teacherModules.contexto?.render(getTeacherModuleContext(currentPanel)) || "",
+        teacherAttendance: (currentPanel) => teacherModules.asistencia?.render(getTeacherModuleContext(currentPanel)) || "",
+        teacherGradebook: (currentPanel) => teacherModules.notas?.render(getTeacherModuleContext(currentPanel)) || "",
+        teacherPlanning: (currentPanel) => teacherModules.planificacion?.render(getTeacherModuleContext(currentPanel)) || "",
+        teacherRisk: (currentPanel) => teacherModules.riesgo?.render(getTeacherModuleContext(currentPanel)) || "",
+        adminUsers: (currentPanel) => adminModules.usuarios?.render(getAdminModuleContext(currentPanel)) || "",
+        adminAcademic: (currentPanel) => adminModules.academico?.render(getAdminModuleContext(currentPanel)) || "",
+        adminRequests: (currentPanel) => adminModules.solicitudes?.render(getAdminModuleContext(currentPanel)) || "",
+        adminMetrics: (currentPanel) => adminModules.metricas?.render(getAdminModuleContext(currentPanel)) || "",
+        adminNews: (currentPanel) => adminModules.noticias?.render(getAdminModuleContext(currentPanel)) || "",
+        adminAudit: (currentPanel) => adminModules.auditoria?.render(getAdminModuleContext(currentPanel)) || ""
     };
 
     return renderers[panel.type] ? renderers[panel.type](panel) : "";
-}
-
-function renderTeacherSections() {
-    const experience = getTeacherExperience();
-
-    return `
-        <div class="teacher-section-grid">
-            ${experience.sections.map((section) => `
-                <button class="teacher-section-card${section.id === selectedTeacherSectionId ? " is-selected" : ""}" type="button" data-section-id="${section.id}" style="--section-accent: ${section.accent}">
-                    <span>${section.code} | Seccion ${section.section}</span>
-                    <strong>${section.subject}</strong>
-                    <small>${section.schedule}</small>
-                    <em>${section.students.length} alumnos | ${section.status}</em>
-                </button>
-            `).join("")}
-        </div>
-    `;
-}
-
-function renderTeacherContext() {
-    const section = getSelectedTeacherSection();
-    const presentCount = section.students.filter((student) => getAttendanceStatus(section.id, student, selectedAttendanceDate) === "Presente").length;
-    const pendingGrades = countPendingGrades(section);
-
-    return `
-        <div class="section-context-card" style="--section-accent: ${section.accent}">
-            <div class="section-context-main">
-                <span>${section.code} | Seccion ${section.section} | ${section.period}</span>
-                <strong>${section.subject}</strong>
-                <p>${section.room} | ${section.schedule}</p>
-            </div>
-            <div class="section-context-metrics">
-                <article><strong>${section.students.length}</strong><span>Alumnos</span></article>
-                <article><strong>${presentCount}</strong><span>Presentes hoy</span></article>
-                <article><strong>${pendingGrades}</strong><span>Notas pendientes</span></article>
-            </div>
-            <div class="section-context-actions">
-                <a class="ghost-button" href="#attendance"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i><span>Tomar asistencia</span></a>
-                <a class="ghost-button" href="#gradebook"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i><span>Cargar notas</span></a>
-            </div>
-        </div>
-    `;
-}
-
-function renderTeacherPlanning() {
-    const section = getSelectedTeacherSection();
-
-    return `
-        <div class="teacher-panel-intro">
-            <strong>${section.subject} | Seccion ${section.section}</strong>
-            <span>Planificacion vinculada a ${section.code}, no a otras asignaturas.</span>
-        </div>
-        <div class="timeline-list">
-            ${section.planning.map((item) => `
-                <article class="timeline-item">
-                    <span><i class="fa-solid ${item.icon}" aria-hidden="true"></i></span>
-                    <div>
-                        <strong>${item.title}</strong>
-                        <p>${item.text}</p>
-                    </div>
-                </article>
-            `).join("")}
-        </div>
-    `;
 }
 
 function getStudentRisk(student) {
@@ -774,42 +863,6 @@ function getStudentRisk(student) {
     return null;
 }
 
-function renderTeacherRisk() {
-    const section = getSelectedTeacherSection();
-    const riskStudents = getTeacherRiskStudents(section);
-
-    if (!riskStudents.length) {
-        return `
-            <div class="teacher-panel-intro">
-                <strong>${section.subject} | Seccion ${section.section}</strong>
-                <span>No hay alumnos en riesgo con la evidencia actual.</span>
-            </div>
-            <p class="muted">Este panel se activa cuando hay al menos dos cortes completamente evaluados y el estudiante tiene 08 o menos en dos cortes.</p>
-        `;
-    }
-
-    return `
-        <div class="teacher-panel-intro">
-            <strong>${section.subject} | Seccion ${section.section}</strong>
-            <span>Seguimiento calculado solo con alumnos inscritos en esta seccion.</span>
-        </div>
-        <div class="people-list">
-            ${riskStudents.map((student) => `
-                <article class="person-row">
-                    ${renderStudentIdentity(student, `${section.subject} | ${student.risk.reason}`)}
-                    <div class="person-actions">
-                        <em>${student.risk.badge}</em>
-                        <button class="contact-student-button" type="button" data-student-name="${student.name}" data-student-document="${student.document}">
-                            <i class="fa-solid fa-message" aria-hidden="true"></i>
-                            <span>Contactar</span>
-                        </button>
-                    </div>
-                </article>
-            `).join("")}
-        </div>
-    `;
-}
-
 function renderStudentIdentity(student, detail) {
     return `
         <div class="student-mini-identity">
@@ -820,97 +873,6 @@ function renderStudentIdentity(student, detail) {
                 <strong>${student.name}</strong>
                 <span>${detail || student.document}</span>
             </div>
-        </div>
-    `;
-}
-
-function renderTeacherAttendance() {
-    const section = getSelectedTeacherSection();
-    const attendanceSummary = section.students.reduce((summary, student) => {
-        const status = getAttendanceStatus(section.id, student, selectedAttendanceDate);
-
-        summary[status] = (summary[status] || 0) + 1;
-        return summary;
-    }, { Presente: 0, Tarde: 0, Ausente: 0 });
-
-    return `
-        <div class="teacher-panel-intro">
-            <strong>${section.subject} | Seccion ${section.section}</strong>
-            <span>${section.nextClass} | Asistencia diaria</span>
-        </div>
-        <div class="attendance-toolbar">
-            <label for="attendance-date-input">
-                <span>Fecha de clase</span>
-                <input id="attendance-date-input" type="date" value="${selectedAttendanceDate}">
-            </label>
-            <div class="attendance-summary" aria-label="Resumen de asistencia">
-                <span><strong>${attendanceSummary.Presente}</strong> Presentes</span>
-                <span><strong>${attendanceSummary.Tarde}</strong> Tardes</span>
-                <span><strong>${attendanceSummary.Ausente}</strong> Ausentes</span>
-            </div>
-        </div>
-        <div class="attendance-list">
-            ${section.students.map((student) => `
-                <article class="attendance-item">
-                    ${renderStudentIdentity(student)}
-                    <div class="attendance-controls" aria-label="Asistencia de ${student.name}" data-student-index="${section.students.indexOf(student)}">
-                        ${["Presente", "Tarde", "Ausente"].map((status) => `
-                            <button class="attendance-chip${getAttendanceStatus(section.id, student, selectedAttendanceDate) === status ? " is-active" : ""}" type="button" data-attendance-status="${status}">${status}</button>
-                        `).join("")}
-                    </div>
-                </article>
-            `).join("")}
-        </div>
-    `;
-}
-
-function renderTeacherGradebook() {
-    const experience = getTeacherExperience();
-    const section = getSelectedTeacherSection();
-    const cuts = ["Primer corte", "Segundo corte", "Tercer corte"];
-
-    return `
-        <div class="teacher-panel-intro">
-            <strong>${section.subject} | ${section.code} | Seccion ${section.section}</strong>
-            <span>Evaluaciones: 10% + 20%, 10% + 20%, 20% + 20% = 100%</span>
-        </div>
-        <div class="grade-plan-strip" aria-label="Plan de evaluacion">
-            ${experience.gradePlan.map((evaluation) => `
-                <span>${evaluation.label}</span>
-            `).join("")}
-        </div>
-        <div class="role-table-wrap gradebook-wrap">
-            <table class="role-table gradebook-table">
-                <thead>
-                    <tr>
-                        <th>Estudiante</th>
-                        ${experience.gradePlan.map((evaluation) => `<th>${evaluation.label}</th>`).join("")}
-                        ${cuts.map((cut) => `<th>${cut}</th>`).join("")}
-                        <th>Acum./Final</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${section.students.map((student, studentIndex) => {
-                        const cutCells = cuts.map((cut) => `<td class="grade-total">${formatGrade(calculateCutScore(student.grades, experience.gradePlan, cut))}</td>`).join("");
-                        const finalScore = calculateWeightedFinal(student.grades, experience.gradePlan);
-
-                        return `
-                            <tr>
-                                <td>
-                                    ${renderStudentIdentity(student)}
-                                </td>
-                                ${experience.gradePlan.map((evaluation) => `
-                                    <td>
-                                        <input class="grade-input" type="number" min="0" max="20" step="0.1" value="${student.grades[evaluation.key]}" data-student-index="${studentIndex}" data-grade-key="${evaluation.key}" aria-label="${evaluation.label} de ${student.name}">
-                                    </td>
-                                `).join("")}
-                                ${cutCells}
-                                <td class="grade-final${finalScore < 10 ? " is-risk" : ""}">${formatGrade(finalScore)}</td>
-                            </tr>
-                        `;
-                    }).join("")}
-                </tbody>
-            </table>
         </div>
     `;
 }
@@ -1001,7 +963,7 @@ function renderPeopleList(panel) {
 
 function renderActionList(panel) {
     if (getCurrentRole() === "teacher" && panel.id === "teacher-messages") {
-        return renderTeacherActions(panel);
+        return teacherModules.acciones?.render(getTeacherModuleContext(panel)) || "";
     }
 
     return `
@@ -1017,87 +979,6 @@ function renderActionList(panel) {
                 </button>
             `).join("")}
         </div>
-    `;
-}
-
-function renderTeacherActions(panel) {
-    const section = getSelectedTeacherSection();
-
-    return `
-        <div class="action-list">
-            ${panel.items.map((item) => {
-                const isLabRequest = item.title === "Solicitar aula laboratorio";
-
-                return `
-                    <button class="action-row${isLabRequest ? " lab-request-trigger" : ""}" type="button" data-action-title="${item.title}">
-                        <span><i class="fa-solid ${item.icon}" aria-hidden="true"></i></span>
-                        <div>
-                            <strong>${item.title}</strong>
-                            <small>${item.text}</small>
-                        </div>
-                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                    </button>
-                `;
-            }).join("")}
-        </div>
-        ${isLabRequestOpen ? renderLabRequestForm(section) : ""}
-        ${lastLabRequest ? renderLabRequestSummary() : ""}
-    `;
-}
-
-function renderLabRequestForm(section) {
-    return `
-        <form class="lab-request-form" id="lab-request-form">
-            <div class="lab-request-heading">
-                <strong>Solicitud de laboratorio</strong>
-                <span>${section.subject} | Seccion ${section.section}</span>
-            </div>
-            <label>
-                <span>Laboratorio</span>
-                <select name="lab" required>
-                    <option value="Informatica">Informatica</option>
-                    <option value="Quimica">Quimica</option>
-                </select>
-            </label>
-            <div class="lab-request-grid">
-                <label>
-                    <span>Fecha</span>
-                    <input name="date" type="date" required>
-                </label>
-                <label>
-                    <span>Hora inicio</span>
-                    <input name="startTime" type="time" required>
-                </label>
-                <label>
-                    <span>Hora fin</span>
-                    <input name="endTime" type="time" required>
-                </label>
-            </div>
-            <label>
-                <span>Motivo</span>
-                <textarea name="reason" rows="3" placeholder="Ej. practica evaluada, demostracion, recuperacion de laboratorio" required></textarea>
-            </label>
-            <div class="lab-request-actions">
-                <button class="profile-secondary-button" type="button" data-close-lab-request>Cancelar</button>
-                <button class="profile-save-button" type="submit">
-                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
-                    <span>Enviar solicitud</span>
-                </button>
-            </div>
-        </form>
-    `;
-}
-
-function renderLabRequestSummary() {
-    return `
-        <article class="lab-request-summary">
-            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-            <div>
-                <strong>Solicitud enviada</strong>
-                <span>${lastLabRequest.lab} | ${lastLabRequest.date} | ${lastLabRequest.startTime} - ${lastLabRequest.endTime}</span>
-                <p>${lastLabRequest.subject} | Seccion ${lastLabRequest.section}</p>
-            </div>
-        </article>
     `;
 }
 
@@ -1125,10 +1006,26 @@ function refreshTeacherPanels(elements) {
 }
 
 function bindRolePanelEvents(elements) {
-    document.querySelectorAll(".teacher-section-card").forEach((button) => {
-        button.addEventListener("click", (event) => {
+    if (getCurrentRole() === "admin") {
+        bindAdminPanelEvents();
+        return;
+    }
+
+    document.querySelectorAll(".teacher-section-card").forEach((card) => {
+        card.addEventListener("click", (event) => {
+            const sectionAction = event.target.closest("[data-section-action]");
+            const sectionActionTarget = sectionAction?.getAttribute("href");
+
+            if (sectionAction) {
+                event.preventDefault();
+            }
+
             selectedTeacherSectionId = event.currentTarget.dataset.sectionId;
             refreshTeacherPanels(elements);
+
+            if (sectionActionTarget) {
+                document.querySelector(sectionActionTarget)?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
         });
     });
 
@@ -1172,6 +1069,24 @@ function bindRolePanelEvents(elements) {
             student.grades[gradeKey] = event.currentTarget.value === "" ? "" : getNumericGrade(event.currentTarget.value);
             refreshTeacherPanels(elements);
             document.querySelector("#gradebook")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    });
+
+    document.querySelectorAll(".save-attendance-button").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            const section = getSelectedTeacherSection();
+
+            saveCurrentAttendance(section, selectedAttendanceDate);
+            confirmPanelSubmit(event.currentTarget, "Asistencias cargadas");
+        });
+    });
+
+    document.querySelectorAll(".save-grades-button").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            const section = getSelectedTeacherSection();
+
+            saveCurrentSectionGrades(section);
+            confirmPanelSubmit(event.currentTarget, "Notas actualizadas");
         });
     });
 
@@ -1240,94 +1155,32 @@ function bindRolePanelEvents(elements) {
     });
 }
 
-let currentNewsIndex = 0;
+function bindAdminPanelEvents() {
+    document.querySelectorAll(".admin-filter").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            const group = event.currentTarget.closest(".admin-filter-group");
 
-function renderNews(elements) {
-    const item = dashboardData.news[currentNewsIndex];
-
-    if (!item) {
-        elements.newsList.innerHTML = '<p class="muted">No hay noticias disponibles.</p>';
-        return;
-    }
-
-    elements.newsList.innerHTML = `
-        <div class="news-carousel simple-carousel" aria-live="polite">
-            <button class="carousel-nav carousel-prev" type="button" aria-label="Noticia anterior">‹</button>
-            <article class="news-slide is-active" role="group" aria-label="${currentNewsIndex + 1} de ${dashboardData.news.length}">
-                <button class="news-slide-image" type="button" data-open-lightbox="${currentNewsIndex}" aria-label="Ver flyer: ${item.title}">
-                    <img src="${item.image || ''}" alt="${item.title}" loading="eager">
-                </button>
-                <div class="news-slide-info">
-                    <time class="news-date">${item.date}</time>
-                    <h3>${item.title}</h3>
-                    <p>${item.text}</p>
-                    <button class="ghost-button" type="button" data-open-lightbox="${currentNewsIndex}">Ver imagen</button>
-                </div>
-            </article>
-            <button class="carousel-nav carousel-next" type="button" aria-label="Siguiente noticia">›</button>
-            <div class="carousel-dots" aria-label="Indicadores de noticias">
-                ${dashboardData.news.map((_, index) => `<button type="button" class="carousel-dot${index === currentNewsIndex ? ' is-active' : ''}" data-news-index="${index}" aria-label="Ir a noticia ${index + 1}"></button>`).join('')}
-            </div>
-        </div>
-    `;
-
-    initNewsCarousel(elements);
-}
-
-function openNewsLightbox(elements, index) {
-    currentLightboxIndex = index;
-    showLightboxAt(index);
-}
-
-function showLightboxAt(index) {
-    const newsItem = dashboardData.news[index];
-    const lightbox = document.querySelector('#news-lightbox');
-    const img = document.querySelector('#news-lightbox-img');
-    const title = document.querySelector('#news-lightbox-title');
-    const text = document.querySelector('#news-lightbox-text');
-    const date = document.querySelector('#news-lightbox-date');
-    const download = document.querySelector('#news-lightbox-download');
-
-    img.src = newsItem.image || '';
-    img.alt = newsItem.title || 'Flyer noticia';
-    title.textContent = newsItem.title || '';
-    text.textContent = newsItem.text || '';
-    date.textContent = newsItem.date || '';
-    download.href = newsItem.image || '#';
-
-    lightbox.hidden = false;
-    lightbox.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('news-lightbox-open');
-}
-
-// Carousel functions
-function initNewsCarousel(elements) {
-    const prev = elements.newsList.querySelector('.carousel-prev');
-    const next = elements.newsList.querySelector('.carousel-next');
-    const dots = elements.newsList.querySelectorAll('.carousel-dot');
-
-    function goTo(index) {
-        currentNewsIndex = (index + dashboardData.news.length) % dashboardData.news.length;
-        renderNews(elements);
-    }
-
-    if (dashboardData.news.length <= 1) {
-        prev.hidden = true;
-        next.hidden = true;
-    }
-
-    prev.addEventListener('click', () => goTo(currentNewsIndex - 1));
-    next.addEventListener('click', () => goTo(currentNewsIndex + 1));
-
-    dots.forEach((dot) => {
-        dot.addEventListener('click', (event) => {
-            goTo(Number(event.currentTarget.dataset.newsIndex));
+            group.querySelectorAll(".admin-filter").forEach((filter) => filter.classList.remove("is-active"));
+            event.currentTarget.classList.add("is-active");
         });
     });
 
-    elements.newsList.querySelectorAll('[data-open-lightbox]').forEach((button) => {
-        button.addEventListener('click', (event) => {
-            openNewsLightbox(elements, Number(event.currentTarget.dataset.openLightbox));
+    document.querySelectorAll("[data-admin-action]").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            const actionLabels = {
+                "create-user": "Usuario preparado",
+                "view-user": "Ficha abierta",
+                "toggle-user": "Permisos revisados",
+                "manage-section": "Seccion lista",
+                "approve-request": "Solicitud aprobada",
+                "review-request": "Revision iniciada",
+                "create-news": "Noticia preparada",
+                "edit-news": "Edicion abierta",
+                "publish-news": "Publicacion enviada"
+            };
+            const label = actionLabels[event.currentTarget.dataset.adminAction] || "Accion lista";
+
+            confirmPanelSubmit(event.currentTarget, label);
         });
     });
 }
@@ -1335,8 +1188,31 @@ function initNewsCarousel(elements) {
 function addPanelActions() {
     document.querySelectorAll('.section-heading').forEach((heading) => {
         if (heading.querySelector('.panel-actions')) return;
+        const article = heading.closest('article');
+        const id = article?.id;
         const actions = document.createElement('div');
         actions.className = 'panel-actions';
+
+        if (id === "notifications" || id === "messages") {
+            const historyBtn = document.createElement('button');
+            historyBtn.type = 'button';
+            historyBtn.title = id === "notifications" ? 'Ver historial de avisos' : 'Ver historial de mensajes';
+            historyBtn.setAttribute('aria-label', historyBtn.title);
+            historyBtn.innerHTML = '<i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>';
+            historyBtn.addEventListener('click', () => resetPanelSearch(article));
+
+            const searchBtn = document.createElement('button');
+            searchBtn.type = 'button';
+            searchBtn.title = id === "notifications" ? 'Buscar avisos' : 'Buscar mensajes';
+            searchBtn.setAttribute('aria-label', searchBtn.title);
+            searchBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>';
+            searchBtn.addEventListener('click', () => togglePanelSearch(article, id));
+
+            actions.appendChild(historyBtn);
+            actions.appendChild(searchBtn);
+            heading.appendChild(actions);
+            return;
+        }
 
         const exportBtn = document.createElement('button');
         exportBtn.type = 'button';
@@ -1356,11 +1232,89 @@ function addPanelActions() {
     });
 }
 
+function ensurePanelSearch(article, id) {
+    let searchBar = article.querySelector('.panel-search-bar');
+
+    if (searchBar) {
+        return searchBar;
+    }
+
+    const placeholder = id === "notifications" ? "Buscar por titulo o aviso" : "Buscar por asunto o mensaje";
+    searchBar = document.createElement('div');
+    searchBar.className = 'panel-search-bar';
+    searchBar.hidden = true;
+    searchBar.innerHTML = `
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input type="search" placeholder="${placeholder}" aria-label="${placeholder}">
+        <button type="button" aria-label="Limpiar busqueda"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+    `;
+
+    article.querySelector('.section-heading')?.after(searchBar);
+
+    const input = searchBar.querySelector('input');
+    const clearButton = searchBar.querySelector('button');
+
+    input.addEventListener('input', () => filterPanelCards(article, input.value));
+    clearButton.addEventListener('click', () => {
+        input.value = '';
+        filterPanelCards(article, '');
+        input.focus();
+    });
+
+    return searchBar;
+}
+
+function togglePanelSearch(article, id) {
+    const searchBar = ensurePanelSearch(article, id);
+    const input = searchBar.querySelector('input');
+    searchBar.hidden = !searchBar.hidden;
+
+    if (!searchBar.hidden) {
+        input.focus();
+        input.select();
+    }
+}
+
+function resetPanelSearch(article) {
+    const searchBar = article.querySelector('.panel-search-bar');
+    const input = searchBar?.querySelector('input');
+
+    if (input) {
+        input.value = '';
+    }
+
+    filterPanelCards(article, '');
+    article.querySelector('.student-alert-list, .student-message-list')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function filterPanelCards(article, query) {
+    const normalizedQuery = normalizeText(query);
+    const cards = Array.from(article.querySelectorAll('.student-alert-card, .student-message-card'));
+    let visibleCount = 0;
+
+    cards.forEach((card) => {
+        const searchableText = normalizeText(card.dataset.searchText || card.innerText);
+        const isVisible = !normalizedQuery || searchableText.includes(normalizedQuery);
+        card.hidden = !isVisible;
+        if (isVisible) {
+            visibleCount += 1;
+        }
+    });
+
+    article.classList.toggle('is-search-empty', Boolean(normalizedQuery) && visibleCount === 0);
+}
+
 function exportPanel(heading) {
     const article = heading.closest('article');
     if (!article) return;
     const id = article.id;
     const role = getCurrentRole();
+
+    if (role === "student" && id === "schedule" && studentModules.horarioAcademico?.exportSchedulePdf) {
+        studentModules.horarioAcademico.exportSchedulePdf(dashboardData, weekDays);
+        return;
+    }
+
     const rolePanel = roleDashboards[role]?.panels.find((panel) => panel.id === id);
     const teacherContextData = role === "teacher" && ["section-context", "attendance", "gradebook"].includes(id)
         ? { panel: id, section: getSelectedTeacherSection(), gradePlan: getTeacherExperience().gradePlan }
@@ -1370,6 +1324,7 @@ function exportPanel(heading) {
         notifications: dashboardData.notifications,
         grades: dashboardData.grades,
         messages: dashboardData.messages,
+        requests: studentModules.solicitudes?.getRequests?.() || [],
         news: dashboardData.news,
         pensum: dashboardData.pensum
     };
@@ -1389,7 +1344,7 @@ function filterPanel(heading) {
     const query = prompt('Texto a filtrar (vacío para reset):');
     const article = heading.closest('article');
     if (!article) return;
-    const container = article.querySelector('.stack-list, .grades-list, .news-grid, .pensum-list, .schedule-grid, .stats-grid, .role-card-grid, .attendance-list, .role-table tbody, .timeline-list, .people-list, .action-list, .metric-grid');
+    const container = article.querySelector('.stack-list, .grades-list, .news-grid, .pensum-list, .student-requests-list, .schedule-grid, .stats-grid, .role-card-grid, .attendance-list, .role-table tbody, .timeline-list, .people-list, .action-list, .metric-grid');
     if (!container) return;
     const items = Array.from(container.children);
     if (!query) {
@@ -1403,31 +1358,6 @@ function filterPanel(heading) {
     });
 }
 
-function closeNewsLightbox() {
-    const lightbox = document.querySelector('#news-lightbox');
-    const img = document.querySelector('#news-lightbox-img');
-
-    lightbox.hidden = true;
-    lightbox.setAttribute('aria-hidden', 'true');
-    img.src = '';
-    document.body.classList.remove('news-lightbox-open');
-    currentLightboxIndex = null;
-}
-
-function showNextNews() {
-    if (currentLightboxIndex === null) return;
-    const next = (currentLightboxIndex + 1) % dashboardData.news.length;
-    currentLightboxIndex = next;
-    showLightboxAt(next);
-}
-
-function showPrevNews() {
-    if (currentLightboxIndex === null) return;
-    const prev = (currentLightboxIndex - 1 + dashboardData.news.length) % dashboardData.news.length;
-    currentLightboxIndex = prev;
-    showLightboxAt(prev);
-}
-
 function toggleSidebar(elements, isOpen) {
     elements.sidebar.classList.toggle("is-open", isOpen);
     elements.overlay.hidden = !isOpen;
@@ -1436,6 +1366,34 @@ function toggleSidebar(elements, isOpen) {
 function bindEvents(elements) {
     elements.menuButton.addEventListener("click", () => toggleSidebar(elements, true));
     elements.overlay.addEventListener("click", () => toggleSidebar(elements, false));
+    elements.settingsControl.addEventListener("mouseenter", () => elements.settingsControl.classList.remove("is-menu-dismissed"));
+    elements.settingsControl.addEventListener("mouseleave", () => elements.settingsControl.classList.remove("is-menu-dismissed"));
+    elements.settingsButton.addEventListener("click", () => openSettingsModal(elements));
+    elements.settingsQuickMenu.querySelectorAll("[data-settings-open]").forEach((button) => {
+        button.addEventListener("click", () => openSettingsModal(elements));
+    });
+    elements.settingsQuickMenu.querySelectorAll("[data-settings-focus]").forEach((button) => {
+        button.addEventListener("click", (event) => openSettingsModal(elements, event.currentTarget.dataset.settingsFocus));
+    });
+    elements.requestsButton.addEventListener("click", () => openRequestsModal(elements));
+    elements.requestsModal.querySelectorAll("[data-requests-close]").forEach((button) => {
+        button.addEventListener("click", () => closeRequestsModal(elements));
+    });
+    elements.settingsModal.querySelectorAll("[data-settings-close]").forEach((button) => {
+        button.addEventListener("click", () => closeSettingsModal(elements));
+    });
+    elements.settingsForm.addEventListener("submit", (event) => handleSettingsSubmit(event, elements));
+    elements.settingsResetButton.addEventListener("click", () => {
+        saveSettings({ ...DEFAULT_SETTINGS });
+        applySettings(DEFAULT_SETTINGS);
+        syncSettingsForm(elements);
+        confirmPanelSubmit(elements.settingsResetButton, "Listo");
+    });
+    elements.settingsClearExpired.addEventListener("click", () => {
+        const removedCount = studentModules.horarioAcademico?.cleanupExpiredReminders?.() || 0;
+        studentModules.horarioAcademico?.render?.(elements, dashboardData, weekDays);
+        confirmPanelSubmit(elements.settingsClearExpired, removedCount ? `${removedCount} limpiado(s)` : "Todo al dia");
+    });
     elements.profileButton.addEventListener("click", () => openProfileModal(elements));
     elements.profilePhotoInput.addEventListener("change", (event) => handleProfilePhotoChange(event, elements));
     elements.profileForm.addEventListener("submit", (event) => handleProfileSubmit(event, elements));
@@ -1443,27 +1401,36 @@ function bindEvents(elements) {
         button.addEventListener("click", () => closeProfileModal(elements));
     });
     document.addEventListener("keydown", (event) => handleProfileKeyboard(event, elements));
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !elements.settingsModal.hidden) {
+            closeSettingsModal(elements);
+        }
+
+        if (event.key === "Escape" && !elements.requestsModal.hidden) {
+            closeRequestsModal(elements);
+        }
+    });
 
     // lightbox close bindings
     const lightboxClose = document.querySelector('#news-lightbox-close');
     const lightboxBackdrop = document.querySelector('.news-lightbox-backdrop');
-    if (lightboxClose) lightboxClose.addEventListener('click', () => closeNewsLightbox());
-    if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', () => closeNewsLightbox());
+    if (lightboxClose) lightboxClose.addEventListener('click', () => studentModules.noticias?.closeLightbox());
+    if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', () => studentModules.noticias?.closeLightbox());
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            closeNewsLightbox();
+            studentModules.noticias?.closeLightbox();
         }
     });
 
     const lightboxPrev = document.querySelector('#news-lightbox-prev');
     const lightboxNext = document.querySelector('#news-lightbox-next');
-    if (lightboxPrev) lightboxPrev.addEventListener('click', () => showPrevNews());
-    if (lightboxNext) lightboxNext.addEventListener('click', () => showNextNews());
+    if (lightboxPrev) lightboxPrev.addEventListener('click', () => studentModules.noticias?.showPrev(dashboardData));
+    if (lightboxNext) lightboxNext.addEventListener('click', () => studentModules.noticias?.showNext(dashboardData));
     // keyboard left/right navigation
     document.addEventListener('keydown', (e) => {
         if (document.querySelector('#news-lightbox') && !document.querySelector('#news-lightbox').hidden) {
-            if (e.key === 'ArrowRight') showNextNews();
-            if (e.key === 'ArrowLeft') showPrevNews();
+            if (e.key === 'ArrowRight') studentModules.noticias?.showNext(dashboardData);
+            if (e.key === 'ArrowLeft') studentModules.noticias?.showPrev(dashboardData);
         }
     });
 
@@ -1485,6 +1452,7 @@ function renderDashboard() {
     const role = getCurrentRole();
 
     document.body.dataset.role = role;
+    syncTopbarSearch(elements, role);
 
     if (role !== "student") {
         const experience = roleDashboards[role];
@@ -1492,6 +1460,7 @@ function renderDashboard() {
         renderNavigation(elements, experience.nav);
         renderRoleIdentity(elements, experience);
         if (role === "teacher") {
+            applySavedTeacherGrades();
             renderRoleHero(elements, getTeacherHero(experience));
             renderRoleStats(elements, getTeacherStats(experience));
         } else {
@@ -1501,6 +1470,7 @@ function renderDashboard() {
         renderRolePanels(elements, experience.panels);
         elements.notificationCount.textContent = experience.notificationsCount;
         elements.profileButton.hidden = role === "admin";
+        elements.requestsButton.hidden = true;
         addPanelActions();
         bindEvents(elements);
         bindRolePanelEvents(elements);
@@ -1513,13 +1483,15 @@ function renderDashboard() {
     loadProfileData();
     renderStudent(elements);
     renderStats(elements);
-    renderSchedule(elements);
-    renderNextClass(elements);
-    renderGrades(elements);
-    renderStackList(elements.notificationsList, dashboardData.notifications);
-    renderStackList(elements.messagesList, dashboardData.messages);
-    renderPensum(elements);
-    renderNews(elements);
+    studentModules.horarioAcademico?.render(elements, dashboardData, weekDays);
+    studentModules.horarioAcademico?.renderNextClass(elements, dashboardData);
+    studentModules.horarioAcademico?.showStartupReminderAlert(elements);
+    studentModules.notas?.render(elements, dashboardData);
+    studentModules.notificaciones?.render(elements, dashboardData);
+    studentModules.mensajes?.render(elements, dashboardData);
+    studentModules.pensum?.render(elements, dashboardData);
+    studentModules.noticias?.render(elements, dashboardData);
+    elements.requestsButton.hidden = false;
     addPanelActions();
     elements.notificationCount.textContent = dashboardData.notifications.length;
     bindEvents(elements);
@@ -1534,6 +1506,7 @@ function revealDashboard() {
 
 document.addEventListener("DOMContentLoaded", () => {
     guardSession();
+    applySettings();
     renderDashboard();
     revealDashboard();
 });
