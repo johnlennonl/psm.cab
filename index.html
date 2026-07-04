@@ -3,106 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Inicio de sesion institucional para la Universidad PSM.">
-    <title>Login | Universidad PSM</title>
+    <meta name="description" content="Web institucional del Instituto Universitario Politecnico Santiago Mariño en Cabimas.">
+    <title>Universidad PSM | Cabimas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="estilos/styles.css">
-    <script src="Js/login.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="estilos/website.css">
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+    <script src="https://unpkg.com/lenis@1.3.4/dist/lenis.min.js" defer></script>
+    <script src="Js/data/dashboardData.js" defer></script>
+    <script src="Js/website.js" defer></script>
 </head>
 <body>
-    <main class="login-page" aria-labelledby="login-title">
-        <div class="login-shell">
-            <section class="brand-panel" aria-label="Presentacion institucional">
-                <h2 class="brand-title">Portal Academico PSM</h2>
-                <p class="brand-copy">
-                    Accede a tus servicios universitarios, gestion academica y recursos institucionales desde un entorno seguro.
-                </p>
-                <div class="brand-badges" aria-label="Servicios disponibles">
-                    <span>Control de estudios</span>
-                    <span>Notas</span>
-                    <span>Inscripciones</span>
+    <header class="site-header" data-site-header>
+        <div class="site-topbar">
+            <a class="site-brand" href="#inicio" aria-label="Inicio PSM Cabimas">
+                <img src="img/PSMCABIMASEDU.VE.png" alt="Logo PSM">
+                <span><strong>Politecnico Santiago Mariño</strong><small>Extension COL - Cabimas</small></span>
+            </a>
+            <div class="site-social" aria-label="Canales institucionales">
+                <a href="mailto:admisioncabimas@psm.edu.ve" aria-label="Correo"><i class="fa-solid fa-envelope" aria-hidden="true"></i></a>
+                <a href="#contacto" aria-label="Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                <a href="#contacto" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                <a href="#contacto" aria-label="YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
+            </div>
+        </div>
+
+        <div class="site-navbar">
+            <button class="site-menu-button" type="button" aria-label="Abrir menu" data-menu-button>
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+
+            <nav class="site-nav" aria-label="Navegacion principal" data-site-nav>
+                <a href="#nosotros">Nosotros</a>
+                <a href="#carreras">Carreras</a>
+                <a href="#admision">Admision</a>
+                <a href="#vida">Vida PSM</a>
+                <a href="#contacto">Contacto</a>
+            </nav>
+
+            <a class="portal-link" href="login.html">
+                <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i>
+                Portal academico
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section id="inicio" class="hero-section">
+            <div class="hero-bg-mark" aria-hidden="true">PSM</div>
+            <div class="hero-content">
+                <p class="section-kicker">Formacion para la Excelencia</p>
+                <h1>Instituto Universitario Politecnico Santiago Mariño.</h1>
+                <p class="hero-copy">Arquitectura, ingenieria y tecnologia desde Cabimas, con docencia, investigacion y extension al servicio del desarrollo profesional.</p>
+                <div class="hero-actions">
+                    <a class="primary-action" href="#carreras">Ver carreras</a>
+                    <a class="secondary-action" href="#admision">Proceso de admision</a>
+                </div>
+            </div>
+
+            <div class="hero-quick-links" aria-label="Accesos rapidos">
+                <a href="#carreras"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i><span>Carreras</span></a>
+                <a href="#admision"><i class="fa-solid fa-file-signature" aria-hidden="true"></i><span>Inscripciones</span></a>
+                <a href="login.html"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Consulta tus notas</span></a>
+                <a href="#vida"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Vida universitaria</span></a>
+            </div>
+        </section>
+
+        <section id="nosotros" class="about-section section-frame">
+            <div class="section-heading">
+                <p class="section-kicker">Quienes somos</p>
+                <h2>Una institucion privada orientada a la excelencia academica.</h2>
+            </div>
+            <div class="about-grid">
+                <article>
+                    <p>Somos una institucion de educacion superior de caracter privado sin fines de lucro, que cumple funciones de docencia, investigacion y extension, dirigidas a formar arquitectos e ingenieros capaces de incorporarse al proceso de desarrollo del pais.</p>
+                    <p>Nuestra organizacion forma parte de una red de institutos y colegios de educacion superior denominada Complejo Educativo Dr. Raul Quero Silva. Nuestro lema es <strong>Formacion para la Excelencia</strong>.</p>
+                </article>
+                <article>
+                    <p>Somos una comunidad de intereses espirituales que reune a profesores, estudiantes y personal administrativo en la tarea de buscar la verdad y afianzar valores trascendentes.</p>
+                    <p>La enseñanza superior se inspira en democracia, justicia social, solidaridad humana y apertura al pensamiento universal, analizado con rigor cientifico.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="carreras" class="careers-section section-frame">
+            <div class="section-heading split">
+                <div>
+                    <p class="section-kicker">Oferta academica</p>
+                    <h2>Carreras ofrecidas por la institucion</h2>
+                </div>
+                <a class="text-link" href="#admision">Ver admision <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div class="career-carousel swiper" data-career-carousel>
+                <div class="career-viewport swiper-wrapper" data-career-track>
+                <article class="career-card swiper-slide" data-career-key="arquitectura" data-career-name="Arquitectura" data-career-faculty="Facultad de Arquitectura" data-career-focus="Diseño arquitectonico, urbanismo, expresion grafica, estructuras basicas y proyecto integral.">
+                    <i class="fa-solid fa-drafting-compass" aria-hidden="true"></i>
+                    <span>Facultad de Arquitectura</span>
+                    <h3>Arquitectura</h3>
+                    <p>Diseño, ciudad, espacio publico, expresion grafica y pensamiento proyectual.</p>
+                    <button class="career-pensum-button" type="button" data-pensum-open>Ver pensum</button>
+                </article>
+                <article class="career-card swiper-slide" data-career-key="civil" data-career-name="Ingenieria Civil" data-career-faculty="Ingenieria" data-career-focus="Estructuras, vialidad, hidraulica, suelos, materiales, obras civiles y gestion de proyectos.">
+                    <i class="fa-solid fa-helmet-safety" aria-hidden="true"></i>
+                    <span>Ingenieria</span>
+                    <h3>Civil</h3>
+                    <p>Obras, estructuras, vialidad, materiales y gestion tecnica de proyectos.</p>
+                    <button class="career-pensum-button" type="button" data-pensum-open>Ver pensum</button>
+                </article>
+                <article class="career-card swiper-slide" data-career-key="sistemas" data-career-name="Ingenieria de Sistemas" data-career-faculty="Ingenieria" data-career-focus="Programacion, bases de datos, redes, sistemas operativos, analisis, diseño y gestion tecnologica.">
+                    <i class="fa-solid fa-laptop-code" aria-hidden="true"></i>
+                    <span>Ingenieria</span>
+                    <h3>Sistemas</h3>
+                    <p>Software, datos, redes, gestion tecnologica y soluciones digitales.</p>
+                    <button class="career-pensum-button" type="button" data-pensum-open>Ver pensum</button>
+                </article>
+                <article class="career-card swiper-slide" data-career-key="electrica" data-career-name="Ingenieria Electrica" data-career-faculty="Ingenieria" data-career-focus="Circuitos, maquinas electricas, potencia, instalaciones, control y energia aplicada.">
+                    <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                    <span>Ingenieria</span>
+                    <h3>Electrica</h3>
+                    <p>Sistemas electricos, potencia, control, instalaciones y energia aplicada.</p>
+                    <button class="career-pensum-button" type="button" data-pensum-open>Ver pensum</button>
+                </article>
+                <article class="career-card swiper-slide" data-career-key="electronica" data-career-name="Ingenieria Electronica" data-career-faculty="Ingenieria" data-career-focus="Electronica analogica y digital, telecomunicaciones, control, automatizacion e instrumentacion.">
+                    <i class="fa-solid fa-microchip" aria-hidden="true"></i>
+                    <span>Ingenieria</span>
+                    <h3>Electronica</h3>
+                    <p>Circuitos, comunicaciones, automatizacion, instrumentacion y tecnologia aplicada.</p>
+                    <button class="career-pensum-button" type="button" data-pensum-open>Ver pensum</button>
+                </article>
+                <article class="career-card swiper-slide" data-career-key="industrial" data-career-name="Ingenieria Industrial" data-career-faculty="Ingenieria" data-career-focus="Produccion, calidad, operaciones, logistica, seguridad industrial y mejora de procesos.">
+                    <i class="fa-solid fa-industry" aria-hidden="true"></i>
+                    <span>Ingenieria</span>
+                    <h3>Industrial</h3>
+                    <p>Procesos productivos, calidad, operaciones, logistica y mejora organizacional.</p>
+                    <button class="career-pensum-button" type="button" data-pensum-open>Ver pensum</button>
+                </article>
+                <article class="career-card swiper-slide" data-career-key="mantenimiento" data-career-name="Ingenieria en Mantenimiento Mecanico" data-career-faculty="Ingenieria" data-career-focus="Maquinas, procesos industriales, mantenimiento, confiabilidad, materiales y gestion tecnica.">
+                    <i class="fa-solid fa-gears" aria-hidden="true"></i>
+                    <span>Ingenieria</span>
+                    <h3>Mantenimiento Mecanico</h3>
+                    <p>Procesos industriales, confiabilidad, maquinas y gestion de mantenimiento.</p>
+                    <button class="career-pensum-button" type="button" data-pensum-open>Ver pensum</button>
+                </article>
+                </div>
+                <div class="career-carousel-bar" aria-label="Controles de carreras">
+                    <button class="career-control" type="button" data-career-prev aria-label="Carrera anterior"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>
+                    <button class="career-control" type="button" data-career-next aria-label="Carrera siguiente"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <div class="pensum-modal" data-pensum-modal hidden>
+            <div class="pensum-backdrop" data-pensum-close></div>
+            <section class="pensum-dialog" role="dialog" aria-modal="true" aria-labelledby="pensum-title">
+                <button class="pensum-close" type="button" data-pensum-close aria-label="Cerrar pensum"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                <p class="section-kicker" data-pensum-faculty>Ingenieria</p>
+                <h2 id="pensum-title" data-pensum-title>Pensum</h2>
+                <p data-pensum-focus></p>
+                <div class="pensum-summary">
+                    <span><strong>10</strong> semestres</span>
+                    <span><strong>5</strong> ejes formativos</span>
+                    <span><strong>PSM</strong> Cabimas</span>
+                </div>
+                <div class="pensum-detail" data-pensum-detail></div>
+                <div class="pensum-actions">
+                    <a href="login.html">Abrir portal academico</a>
+                    <a href="#admision" data-pensum-close>Solicitar admision</a>
                 </div>
             </section>
-
-            <section class="login-card" aria-label="Formulario de inicio de sesion">
-                <header class="login-header">
-                    <div class="logo-frame">
-                        <img
-                            id="psm-logo"
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV9LbEAGp9j_T1kVfdlxqC_nBdX74pdTPnZAHp3llB1PQPpkl-ZBNNjds0&s=10"
-                            alt="Logo Universidad PSM"
-                        >
-                    </div>
-                    <p class="eyebrow">Acceso institucional</p>
-                    <h1 id="login-title" class="login-title">Iniciar sesion</h1>
-                    <p class="login-subtitle">Ingresa con tu documento de identidad y contraseña del portal.</p>
-                </header>
-
-                <div id="error-box" class="error-box" role="alert" aria-live="polite" hidden></div>
-
-                <form id="login-form" class="login-form" novalidate>
-                    <div class="form-group">
-                        <label for="document-number">Cedula de Identidad</label>
-                        <div class="form-row">
-                            <select id="document-type" class="document-select" name="documentType" aria-label="Tipo de documento">
-                                <option value="V">V</option>
-                                <option value="E">E</option>
-                            </select>
-                            <input
-                                id="document-number"
-                                class="control"
-                                name="documentNumber"
-                                type="number"
-                                inputmode="numeric"
-                                autocomplete="username"
-                                placeholder="Ej. 12345678"
-                                maxlength="10"
-                                required
-                            >
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password">Contraseña</label>
-                        <div class="password-field">
-                            <input
-                                id="password"
-                                class="control"
-                                name="password"
-                                type="password"
-                                autocomplete="current-password"
-                                placeholder="Ingresa tu contrasena"
-                                required
-                            >
-                            <button id="toggle-password" class="icon-button" type="button" aria-label="Mostrar contrasena">
-                                <i class="fa-solid fa-eye" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-options">
-                        <label class="check-option" for="remember-session">
-                            <input id="remember-session" name="rememberSession" type="checkbox">
-                            Recordarme
-                        </label>
-                        <a id="forgot-password" class="forgot-link" href="#">Olvide mi contrasena</a>
-                    </div>
-
-                    <button id="login-button" class="login-button" type="submit">
-                        <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
-                        <span>Iniciar sesion</span>
-                    </button>
-                </form>
-
-                <p class="login-help">
-                    Accesos de prueba: estudiante V-24485562, profesor V-11111111, admin V-99999999. Contrasena 123456.
-                    <a class="support-link" href="mailto:soporte@psm.edu.ve">Soporte</a>
-                </p>
-            </section>
         </div>
+
+        <section id="admision" class="admission-section">
+            <div class="admission-panel">
+                <div class="admission-intro">
+                    <p class="section-kicker">Procesos institucionales</p>
+                    <h2>Inscripcion y equivalencias</h2>
+                    <p>Requisitos oficiales para formalizar tu ingreso, traslado o estudio por equivalencias en la sede Cabimas.</p>
+                </div>
+                <div class="admission-content">
+                    <div class="admission-cards">
+                        <article class="admission-card">
+                            <div class="admission-card-head">
+                                <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                                <div><span>Nuevo ingreso</span><h3>Documentos para inscripcion</h3></div>
+                            </div>
+                            <ul class="admission-list">
+                                <li>Recibos de pago canjeados en el area de caja.</li>
+                                <li>Titulo de Bachiller original, copia y fondo negro certificado.</li>
+                                <li>Constancia de tramitacion ante el Ministerio de Educacion si aun no posee titulo.</li>
+                                <li>Partida de nacimiento vigente, original y copia, sin enmiendas.</li>
+                                <li>Notas certificadas de bachillerato en formato nuevo, original y copia.</li>
+                                <li>Cedula de identidad vigente ampliada al 129%.</li>
+                                <li>Comprobante RUSNIES como constancia de preinscripcion CNU.</li>
+                                <li>Constancia de inscripcion militar o carnet, para mayores de 18 años.</li>
+                                <li>Carta de buena conducta y cuatro fotos carnet fondo azul.</li>
+                            </ul>
+                            <p class="admission-note"><strong>Nota:</strong> si el aspirante es menor de edad, debe asistir con su representante.</p>
+                        </article>
+
+                        <article class="admission-card admission-card-featured">
+                            <div class="admission-card-head">
+                                <i class="fa-solid fa-right-left" aria-hidden="true"></i>
+                                <div><span>Equivalencias</span><h3>Ingreso por estudios previos</h3></div>
+                            </div>
+                            <ul class="admission-list">
+                                <li>Requisitos generales de nuevo ingreso, incluyendo pagos, identificacion y recaudos academicos.</li>
+                                <li>Titulo de Tecnico Superior Universitario registrado, copia y fondo negro certificado.</li>
+                                <li>Cedula de identidad ampliada al 129% y notas certificadas de TSU.</li>
+                                <li>Pensum de estudio vigente, sellado y firmado.</li>
+                                <li>Programas de asignaturas sellados y firmados.</li>
+                                <li>Carpeta manila marron tamaño oficio con gancho.</li>
+                            </ul>
+                            <p class="admission-note"><strong>Importante:</strong> el pensum y los programas deben venir separados e identificados en el mismo orden reflejado en el pensum.</p>
+                        </article>
+                    </div>
+
+                    <aside class="admission-info" aria-label="Informacion de admision">
+                        <div>
+                            <span>Horario de atencion</span>
+                            <strong>Lunes a viernes</strong>
+                            <p>08:00am - 12:00m<br>03:00pm - 07:00pm</p>
+                        </div>
+                        <div>
+                            <span>Contacto</span>
+                            <strong>admision@psmcabimas.edu.ve</strong>
+                            <p>Control academico atiende solicitudes de nuevo ingreso, traslados, cambio de carrera y congelamiento de semestre.</p>
+                        </div>
+                        <a href="#contacto">Solicitar orientacion <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <section id="vida" class="life-section section-frame">
+            <div class="section-heading split">
+                <div>
+                    <p class="section-kicker">Vida PSM</p>
+                    <h2>Una comunidad que se vive dentro y fuera del aula.</h2>
+                </div>
+                <div class="life-tabs" role="tablist" aria-label="Noticias PSM">
+                    <button class="is-active" type="button" data-life-filter="all">Todo</button>
+                    <button type="button" data-life-filter="events">Eventos</button>
+                    <button type="button" data-life-filter="meetings">Encuentros</button>
+                    <button type="button" data-life-filter="graduates">Graduados</button>
+                </div>
+            </div>
+            <div class="life-grid">
+                <article class="life-card life-card-feature" data-life-card="events">
+                    <figure style="--life-image: url('https://diarioelregionaldelzulia.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-13-at-7.25.27-PM-1.webp');"><img src="https://diarioelregionaldelzulia.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-13-at-7.25.27-PM-1.webp" alt="Expo feria academica PSM Cabimas"></figure>
+                    <div><span>Deportes</span><h3>Dia de la Juventud</h3><p> Dentro del marco del día de la Juventud, el instituto politécnico Santiago Mariño, extensión Cabimas, recibió las delegaciones de las unidades educativas privadas: Dra.Flor Romero, Ángel de la Guarda, Coquivacoa y Señor Jesucristo para dar apertura al cuadrangular de Voleibol.</p></div>
+                </article>
+                <article class="life-card" data-life-card="meetings">
+                    <figure style="--life-image: url('https://diarioelregionaldelzulia.com/wp-content/uploads/2025/10/psm4.webp');"><img src="https://diarioelregionaldelzulia.com/wp-content/uploads/2025/10/psm4.webp" alt="Encuentro Mundial PSM Cabimas"></figure>
+                    <div><span>Encuentros</span><h3>PSM Cabimas celebra 32 años de excelencia educativa</h3><p>La institución fue Fundada por el Dr. Raúl Quero Silva, un ilustre venezolano dedicado a la educación de calidad, es por ello, que esta casa de estudios se ha consolidado como un referente en la formación de profesionales en distintas áreas.</p></div>
+                </article>
+                <article class="life-card" data-life-card="events">
+                    <figure style="--life-image: url('../img/WhatsApp Image 2026-06-18 at 10.26.34 AM (1).jpeg');"><img src="img/WhatsApp Image 2026-06-18 at 10.26.34 AM (1).jpeg" alt="Jornadas de investigacion PSM"></figure>
+                    <div><span>Agenda</span><h3>Jornadas academicas</h3><p>Investigacion, pasantias, emprendimiento y conferencias para mirar la profesion desde la practica.</p></div>
+                </article>
+                <article class="life-card life-card-graduates" data-life-card="graduates">
+                    <figure style="--life-image: url('https://diarioelregionaldelzulia.com/wp-content/uploads/2026/05/image-2026-05-30T060700.857.webp');"><img src="https://diarioelregionaldelzulia.com/wp-content/uploads/2026/05/image-2026-05-30T060700.857.webp" alt="Identidad institucional PSM Cabimas"></figure>
+                    <div><span>Eventos</span><h3>Networking Digital 2026</h3><p>El Instituto Universitario Politécnico Santiago Mariño, extensión Cabimas, se convirtió nuevamente en el epicentro tecnológico y empresarial de la región al realizar con total éxito la Segunda Edición del Networking Digital 2026, el evento consolidó una vez más los lazos entre la academia, el sector empresarial y el talento joven del municipio.</p></div>
+                </article>
+            </div>
+        </section>
+
+        <footer id="contacto" class="site-footer">
+            <div class="footer-hero">
+                <div>
+                    <p class="section-kicker">Contacto</p>
+                    <h2>Conecta con PSM Cabimas</h2>
+                    <p>Orientacion para admision, control academico, carreras, equivalencias y acceso al portal institucional.</p>
+                </div>
+                <div class="footer-actions">
+                    <a href="mailto:admision@psmcabimas.edu.ve"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Escribir a admision</a>
+                    <a href="login.html"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Portal academico</a>
+                </div>
+            </div>
+            <div class="footer-grid">
+                <div class="footer-brand-block">
+                    <img src="img/PSMCABIMASEDU.VE.png" alt="Logo PSM Cabimas">
+                    <h3>Politecnico Santiago Mariño</h3>
+                    <p>Extension Costa Oriental del Lago - Cabimas. Formacion para la excelencia.</p>
+                    <div class="footer-social" aria-label="Redes sociales PSM">
+                        <a href="#contacto" aria-label="Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                        <a href="#contacto" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                        <a href="#contacto" aria-label="YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <nav class="footer-links" aria-label="Enlaces del sitio">
+                    <h3>Institucion</h3>
+                    <a href="#nosotros">Nosotros</a>
+                    <a href="#carreras">Carreras</a>
+                    <a href="#admision">Admision</a>
+                    <a href="#vida">Vida PSM</a>
+                </nav>
+                <div class="footer-links">
+                    <h3>Atencion</h3>
+                    <a href="mailto:admision@psmcabimas.edu.ve">admision@psmcabimas.edu.ve</a>
+                    <a href="mailto:soporte@psm.edu.ve">soporte@psm.edu.ve</a>
+                    <span>Cabimas - Zulia</span>
+                    <span>Lunes a viernes</span>
+                </div>
+                <div class="footer-card">
+                    <span>Procesos activos</span>
+                    <strong>Nuevo ingreso y equivalencias</strong>
+                    <p>Prepara tus recaudos y solicita acompanamiento antes de formalizar.</p>
+                    <a href="#admision">Ver requisitos</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>PSM Cabimas</span>
+                <span>Formacion para la Excelencia</span>
+                <span>2026</span>
+            </div>
+        </footer>
     </main>
 </body>
 </html>

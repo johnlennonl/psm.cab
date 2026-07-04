@@ -389,7 +389,7 @@ function guardSession() {
     const token = localStorage.getItem("psm_auth_token");
 
     if (!token) {
-        window.location.href = "../index.html";
+        window.location.href = "../login.html";
     }
 }
 
@@ -1443,7 +1443,7 @@ function bindEvents(elements) {
         localStorage.removeItem("psm_user_role");
         localStorage.removeItem("psm_user_name");
         localStorage.removeItem("psm_user_document");
-        window.location.href = "../index.html";
+        window.location.href = "../login.html";
     });
 }
 

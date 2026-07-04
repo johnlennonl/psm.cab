@@ -9,6 +9,11 @@ const VALID_IDENTITIES = [
 const VALID_PASSWORD = "123456";
 const NETWORK_DELAY_MS = 1500;
 const REDIRECT_URL = "Pages/dashboard.html";
+const DEMO_IDENTITIES = {
+    student: { documentType: "V", documentNumber: "24485562" },
+    teacher: { documentType: "V", documentNumber: "11111111" },
+    admin: { documentType: "V", documentNumber: "99999999" }
+};
 
 function getDomElements() {
     return {
@@ -19,7 +24,8 @@ function getDomElements() {
         loginButton: document.querySelector("#login-button"),
         errorBox: document.querySelector("#error-box"),
         togglePasswordButton: document.querySelector("#toggle-password"),
-        forgotPasswordLink: document.querySelector("#forgot-password")
+        forgotPasswordLink: document.querySelector("#forgot-password"),
+        roleButtons: Array.from(document.querySelectorAll("[data-login-demo]"))
     };
 }
 
@@ -51,7 +57,7 @@ function setLoadingState(elements, isLoading) {
     elements.loginButton.disabled = isLoading;
     elements.loginButton.classList.toggle("is-loading", isLoading);
     elements.loginButton.innerHTML = isLoading
-        ? '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>Validando...</span>'
+        ? '<span class="login-loader" aria-hidden="true"><span></span></span><span>Validando acceso...</span>'
         : '<i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i><span>Iniciar sesion</span>';
 
     controls.forEach((control) => {
@@ -115,6 +121,25 @@ function handleForgotPassword(event, elements) {
     showError(elements.errorBox, "Para recuperar tu contrasena, contacta al departamento de control de estudios o soporte PSM.");
 }
 
+function selectDemoIdentity(role, elements) {
+    const identity = DEMO_IDENTITIES[role];
+
+    if (!identity) {
+        return;
+    }
+
+    elements.documentType.value = identity.documentType;
+    elements.documentNumber.value = identity.documentNumber;
+    elements.passwordInput.value = VALID_PASSWORD;
+    hideError(elements.errorBox);
+
+    elements.roleButtons.forEach((button) => {
+        const isActive = button.dataset.loginDemo === role;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+    });
+}
+
 async function handleSubmit(event, elements) {
     event.preventDefault();
 
@@ -160,6 +185,9 @@ function initLoginModule() {
     elements.form.addEventListener("submit", (event) => handleSubmit(event, elements));
     elements.togglePasswordButton.addEventListener("click", () => togglePasswordVisibility(elements));
     elements.forgotPasswordLink.addEventListener("click", (event) => handleForgotPassword(event, elements));
+    elements.roleButtons.forEach((button) => {
+        button.addEventListener("click", () => selectDemoIdentity(button.dataset.loginDemo, elements));
+    });
 }
 
-document.addEventListener("DOMContentLoaded", initLoginModule);
+document.addEventListener("DOMContentLoaded", initLoginModule); 
