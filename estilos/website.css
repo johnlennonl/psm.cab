@@ -49,6 +49,114 @@ img {
     max-width: 100%;
 }
 
+.floating-actions {
+    position: fixed;
+    right: clamp(14px, 3vw, 34px);
+    bottom: clamp(16px, 3vw, 34px);
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(18px) scale(0.96);
+    transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.floating-actions.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.floating-contact,
+.floating-top {
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: var(--white);
+    background:
+        linear-gradient(135deg, rgba(15, 63, 143, 0.94), rgba(7, 27, 67, 0.96));
+    box-shadow: 0 20px 48px rgba(7, 27, 67, 0.28);
+    backdrop-filter: blur(14px);
+}
+
+.floating-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 58px;
+    border-radius: 999px;
+    padding: 8px 18px 8px 10px;
+}
+
+.floating-contact i,
+.floating-top i {
+    display: inline-grid;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--navy);
+    background: var(--gold-soft);
+}
+
+.floating-contact i {
+    width: 40px;
+    height: 40px;
+}
+
+.floating-contact span {
+    display: grid;
+    line-height: 1.05;
+}
+
+.floating-contact strong {
+    font-size: 0.86rem;
+    font-weight: 900;
+}
+
+.floating-contact small {
+    margin-top: 4px;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.68rem;
+    font-weight: 800;
+}
+
+.floating-top {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.floating-top::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: inherit;
+    border: 1px solid rgba(215, 169, 52, 0.5);
+    animation: floating-pulse 1.9s ease-in-out infinite;
+}
+
+.floating-top i {
+    width: 34px;
+    height: 34px;
+    font-size: 0.88rem;
+}
+
+.floating-contact:hover,
+.floating-contact:focus-visible,
+.floating-top:hover,
+.floating-top:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 24px 58px rgba(7, 27, 67, 0.36);
+}
+
+@keyframes floating-pulse {
+    0%, 100% { opacity: 0.36; transform: scale(0.96); }
+    50% { opacity: 1; transform: scale(1.08); }
+}
+
 .site-header {
     position: fixed;
     inset: 0 0 auto;
@@ -1643,6 +1751,28 @@ img {
     .footer-bottom {
         flex-direction: column;
     }
+
+    .floating-actions {
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+        justify-content: flex-end;
+    }
+
+    .floating-contact {
+        min-height: 52px;
+        padding-right: 12px;
+    }
+
+    .floating-contact small {
+        display: none;
+    }
+
+    .floating-top {
+        width: 52px;
+        height: 52px;
+        flex: 0 0 52px;
+    }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1705,5 +1835,17 @@ img {
 
     @keyframes hero-rise {
         to { opacity: 1; transform: translateY(0); }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .floating-actions,
+    .floating-contact,
+    .floating-top {
+        transition: none;
+    }
+
+    .floating-top::before {
+        animation: none;
     }
 }

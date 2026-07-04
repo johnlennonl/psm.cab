@@ -7,6 +7,8 @@ const lifeCards = [...document.querySelectorAll("[data-life-card]")];
 const careerCarousel = document.querySelector("[data-career-carousel]");
 const careerCards = [...document.querySelectorAll(".career-card")];
 const pensumModal = document.querySelector("[data-pensum-modal]");
+const floatingActions = document.querySelector("[data-floating-actions]");
+const scrollTopButton = document.querySelector("[data-scroll-top]");
 const sistemasPensum = window.PSM_DASHBOARD_DATA?.pensum || [];
 const reduceMotionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -41,6 +43,16 @@ const lenis = initSmoothScroll();
 
 function updateHeaderState() {
     header?.classList.toggle("is-scrolled", window.scrollY > 18);
+    floatingActions?.classList.toggle("is-visible", window.scrollY > 640);
+}
+
+function scrollToPageTop() {
+    if (lenis) {
+        lenis.scrollTo(0, { duration: 1.12 });
+        return;
+    }
+
+    window.scrollTo({ top: 0, behavior: reduceMotionPreference.matches ? "auto" : "smooth" });
 }
 
 function closeMenu() {
@@ -56,6 +68,8 @@ menuButton?.addEventListener("click", () => {
 navLinks.forEach((link) => {
     link.addEventListener("click", () => closeMenu());
 });
+
+scrollTopButton?.addEventListener("click", scrollToPageTop);
 
 lifeButtons.forEach((button) => {
     button.addEventListener("click", () => {
