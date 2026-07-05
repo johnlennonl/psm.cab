@@ -7,10 +7,10 @@
     --paper: #f7f3ea;
     --white: #ffffff;
     --ink: #101828;
-    --muted: #647084;
+    --muted: #777b81;
     --line: rgba(7, 27, 67, 0.14);
     --shadow: 0 24px 70px rgba(7, 27, 67, 0.18);
-    --hero-campus-image: url("../img/psm4.webp");
+    --hero-campus-image: url("../img/fachada.png");
 }
 
 * {

@@ -46,6 +46,8 @@ function updateHeaderState() {
     floatingActions?.classList.toggle("is-visible", window.scrollY > 640);
 }
 
+lenis?.on?.("scroll", updateHeaderState);
+
 function scrollToPageTop() {
     if (lenis) {
         lenis.scrollTo(0, { duration: 1.12 });
